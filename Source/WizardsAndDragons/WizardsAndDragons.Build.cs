@@ -8,6 +8,8 @@ public class WizardsAndDragons : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "GameplayTasks", "UMG", "OnlineSubsystem", "OnlineSubsystemUtils", "OnlineSubsystemNull" });
+
+		PrivateDependencyModuleNames.AddRange(new string[] { });
 	}
 }
