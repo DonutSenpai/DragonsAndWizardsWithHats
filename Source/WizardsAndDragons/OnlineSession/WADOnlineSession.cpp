@@ -80,7 +80,7 @@ void UWADOnlineSession::HandleStartSessionComplete(FName SessionName, bool bWasS
 
 	if (bWasSuccessful)
 	{
-		UGameplayStatics::OpenLevel(GetWorld(), FName(TEXT("POC")), true, "listen");
+		UGameplayStatics::OpenLevel(GetWorld(), FName(TEXT("ThirdPersonExampleMap")), true, "listen");
 	}
 }
 
@@ -207,7 +207,7 @@ void UWADOnlineSession::HandleSessionDestroyed(FName SessionName, bool bWasSucce
 
 			if (bWasSuccessful)
 			{
-				UGameplayStatics::OpenLevel(GetWorld(), "MAP_MainMenu", true);
+				UGameplayStatics::OpenLevel(GetWorld(), "ThirdPersonExampleMap", true);
 			}
 		}
 	}
