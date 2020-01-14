@@ -4,15 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "WizardsAndDragonsGameMode.generated.h"
+#include "WADGameModeBase.generated.h"
 
 UCLASS(minimalapi)
-class AWizardsAndDragonsGameMode : public AGameModeBase
+class AWADGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
-public:
-	AWizardsAndDragonsGameMode();
 };
 
 
