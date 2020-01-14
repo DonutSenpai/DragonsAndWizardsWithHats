@@ -8,6 +8,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "../SpellTargetSystem/SpellTargetSystemComponent.h"
+#include "WADPlayerController.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AWizardsAndDragonsCharacter
@@ -47,11 +49,18 @@ AWizardsAndDragonsCharacter::AWizardsAndDragonsCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
+void AWizardsAndDragonsCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
 void AWizardsAndDragonsCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
+
+	if (!IsLocallyControlled()) return;
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
@@ -60,48 +69,25 @@ void AWizardsAndDragonsCharacter::SetupPlayerInputComponent(class UInputComponen
 	PlayerInputComponent->BindAxis("MoveForward", this, &AWizardsAndDragonsCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AWizardsAndDragonsCharacter::MoveRight);
 
-	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
-	// "turn" handles devices that provide an absolute delta, such as a mouse.
-	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("TurnRate", this, &AWizardsAndDragonsCharacter::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	PlayerInputComponent->BindAxis("LookUpRate", this, &AWizardsAndDragonsCharacter::LookUpAtRate);
+	PlayerInputComponent->BindAxis("Turn", this, &AWizardsAndDragonsCharacter::Turn);
+	PlayerInputComponent->BindAxis("LookUp", this, &AWizardsAndDragonsCharacter::LookUp);
 
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &AWizardsAndDragonsCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &AWizardsAndDragonsCharacter::TouchStopped);
-
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AWizardsAndDragonsCharacter::OnResetVR);
 }
 
-
-void AWizardsAndDragonsCharacter::OnResetVR()
+void AWizardsAndDragonsCharacter::Turn(float Rate)
 {
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+	if (RotateCamera)
+	{
+		AddControllerYawInput(Rate);
+	}
 }
 
-void AWizardsAndDragonsCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
+void AWizardsAndDragonsCharacter::LookUp(float Rate)
 {
-		Jump();
-}
-
-void AWizardsAndDragonsCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		StopJumping();
-}
-
-void AWizardsAndDragonsCharacter::TurnAtRate(float Rate)
-{
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
-}
-
-void AWizardsAndDragonsCharacter::LookUpAtRate(float Rate)
-{
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	if (RotateCamera)
+	{
+		AddControllerPitchInput(Rate);
+	}
 }
 
 void AWizardsAndDragonsCharacter::MoveForward(float Value)
@@ -120,12 +106,12 @@ void AWizardsAndDragonsCharacter::MoveForward(float Value)
 
 void AWizardsAndDragonsCharacter::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
+
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
