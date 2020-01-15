@@ -21,6 +21,12 @@ public:
 
 	float PreviousMouseX = 0.0f;
 	float PreviousMouseY = 0.0f;
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USpellTargetSystemComponent* SpellTargetSystem = nullptr;
+
 private:
 
 	void PrintLeftClick();

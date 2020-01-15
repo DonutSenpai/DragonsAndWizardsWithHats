@@ -10,6 +10,27 @@ class USpellTargetSystemComponent : public UActorComponent
 public:
 	USpellTargetSystemComponent();
 
-	UPROPERTY(VisibleAnywhere)
-	class UDecalComponent* SpellTarget;
+	UPROPERTY(NoClear, EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class ASpellTarget> SpellTargetClass;
+
+	UFUNCTION(BlueprintCallable, Category = SpellTargetSystem)
+	void StartSpellTargetSystem(float Radius);
+
+	UFUNCTION(BlueprintCallable, Category = SpellTargetSystem)
+	void StopSpellTargetSystem();
+
+	//Set from the controller
+	UPROPERTY()
+	class AWADPlayerController* OwningController;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ASpellTarget* SpellTarget = nullptr;
+
+protected:
+
+
+
+	FTimerHandle SpellTargetHandle;
+	UFUNCTION()
+	void SimulateSpellTarget();
 };

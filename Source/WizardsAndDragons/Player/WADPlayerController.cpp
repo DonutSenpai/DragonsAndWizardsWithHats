@@ -1,9 +1,10 @@
 #include "WADPlayerController.h"
 #include "WizardsAndDragonsCharacter.h"
+#include "../SpellTargetSystem/SpellTargetSystemComponent.h"
 
 AWADPlayerController::AWADPlayerController()
 {
-
+	SpellTargetSystem = CreateDefaultSubobject<USpellTargetSystemComponent>(TEXT("SpellTargetSystemComponent"));
 }
 
 void AWADPlayerController::SetupInputComponent()
@@ -24,6 +25,8 @@ void AWADPlayerController::BeginPlay()
 	SetInputMode(FInputModeGameAndUI());
 
 	OwnedCharacter = Cast<AWizardsAndDragonsCharacter>(GetCharacter());
+	SpellTargetSystem->OwningController = this;
+
 }
 
 void AWADPlayerController::SetRotateCameraTrue()
