@@ -52,6 +52,17 @@ AWizardsAndDragonsCharacter::AWizardsAndDragonsCharacter()
 void AWizardsAndDragonsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		Multicast_SetHat(FMath::RandRange(0, 1));
+	}
+
+}
+
+void AWizardsAndDragonsCharacter::Multicast_SetHat_Implementation(int HatNumber)
+{
+	SetHat(HatNumber);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -118,3 +129,5 @@ void AWizardsAndDragonsCharacter::MoveRight(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
+
+

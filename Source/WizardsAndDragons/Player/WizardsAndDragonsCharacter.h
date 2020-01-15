@@ -45,6 +45,12 @@ protected:
 	/** Called for side to side input */
 	void MoveRight(float Value);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Hats)
+	void SetHat(int HatNumber);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetHat(int HatNumber);
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
