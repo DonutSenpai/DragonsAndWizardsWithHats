@@ -14,6 +14,7 @@ public:
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
 
+	UPROPERTY(BlueprintReadOnly)
 	class AWizardsAndDragonsCharacter* OwnedCharacter;
 
 	void SetRotateCameraTrue();
@@ -21,6 +22,9 @@ public:
 
 	float PreviousMouseX = 0.0f;
 	float PreviousMouseY = 0.0f;
+
+	UFUNCTION(BlueprintCallable)
+	void StartSpellTargetSystem(class USpellBase* Spell);
 
 protected:
 
@@ -30,7 +34,7 @@ protected:
 private:
 
 	void PrintLeftClick();
-	void PrintLeftRelease();
+	void CastSpell();
 
 
 };

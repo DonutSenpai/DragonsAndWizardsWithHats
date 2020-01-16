@@ -14,7 +14,7 @@ public:
 	TSubclassOf<class ASpellTarget> SpellTargetClass;
 
 	UFUNCTION(BlueprintCallable, Category = SpellTargetSystem)
-	void StartSpellTargetSystem(float Radius);
+	void StartSpellTargetSystem(class USpellBase* Spell);
 
 	UFUNCTION(BlueprintCallable, Category = SpellTargetSystem)
 	void StopSpellTargetSystem();
@@ -23,14 +23,26 @@ public:
 	UPROPERTY()
 	class AWADPlayerController* OwningController;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	class ASpellTarget* SpellTarget = nullptr;
+
+	UFUNCTION(BlueprintCallable)
+	void CastSpell();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE bool GetIsSystemActive(){ return bIsSystemActive; }
+
 
 protected:
 
+	bool bIsSystemActive = false;
 
+	UPROPERTY()
+	class USpellBase* SelectedSpell = nullptr;
 
 	FTimerHandle SpellTargetHandle;
 	UFUNCTION()
 	void SimulateSpellTarget();
+
+	FHitResult OutHitMousePosition;
 };

@@ -35,6 +35,9 @@ public:
 	UPROPERTY()
 	bool RotateCamera = false;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = SpellSlots)
+	TArray<class USpellBase*> SpellSlots;
+
 protected:
 	void Turn(float Rate);
 	void LookUp(float Rate);

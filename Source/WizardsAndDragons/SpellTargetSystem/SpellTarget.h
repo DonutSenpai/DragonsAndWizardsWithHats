@@ -19,6 +19,11 @@ public:
 
 protected:
 
+	void BeginPlay() override;
+
+
+protected:
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class USceneComponent* Root = nullptr;
 

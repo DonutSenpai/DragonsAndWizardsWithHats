@@ -4,9 +4,19 @@
 
 void USpellBase::Server_CastSpell_Implementation(FVector TargetLocation)
 {
+	if (CurrentCooldown > 0.0f) return;
+
 	CurrentCooldown = Cooldown;
 	GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &USpellBase::CountDownCooldown, 0.1f, true, 0.0f);
+	Multicast_OnCastSpellEffects(TargetLocation);
 
+	
+
+}
+
+void USpellBase::Multicast_OnCastSpellEffects_Implementation(FVector TargetLocation)
+{
+	OnCastSpellEffects(TargetLocation);
 }
 
 void USpellBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

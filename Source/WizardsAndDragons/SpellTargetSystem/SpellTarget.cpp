@@ -16,6 +16,10 @@ ASpellTarget::ASpellTarget()
 void ASpellTarget::SetRadius(float Radius)
 {
 	TargetDecal->DecalSize = FVector(Radius);
-	SpellCollision->SetSphereRadius(Radius);
-	
+	SpellCollision->SetSphereRadius(Radius);	
+}
+
+void ASpellTarget::BeginPlay()
+{
+	Super::BeginPlay();
 }
