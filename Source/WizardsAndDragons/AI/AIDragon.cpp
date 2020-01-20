@@ -6,17 +6,24 @@
 #include "BrainComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
-
+#include "../Components/WADHealthComponent.h"
 
 AAIDragon::AAIDragon()
 {
+	HealthComponent = CreateDefaultSubobject<UWADHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent->SetIsReplicated(true);
+
+	SetReplicates(true);
 }
 
 void AAIDragon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	HealthCurrent = Health;
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.AddDynamic(this, &AAIDragon::OnDie);
+	}
 }
 
 bool AAIDragon::ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const
@@ -44,7 +51,7 @@ void AAIDragon::OnDie()
 		}
 	}
 
-	PlayAnimMontage(GetRandomDeathAnimation());
+	//PlayAnimMontage(GetRandomDeathAnimation());
 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAIDragon::DoRagdoll, FMath::RandRange(0.25f, 0.5f), false);
@@ -65,19 +72,6 @@ class UAnimMontage* AAIDragon::GetRandomDeathAnimation() const
 	return DeathAnims[FMath::RandRange(0, DeathAnims.Num() - 1)];
 }
 
-bool AAIDragon::IsDead() const
-{
-	return HealthCurrent <= 0.0f;
-}
-
-void AAIDragon::OnRep_CurrentHealth()
-{
-	if (IsDead())
-	{
-		OnDie();
-	}
-}
-
 void AAIDragon::DoRagdoll()
 {
 	GetCapsuleComponent()->SetCollisionProfileName(FName(TEXT("NoCollision")));
@@ -86,33 +80,75 @@ void AAIDragon::DoRagdoll()
 	SetLifeSpan(10.0f);
 }
 
-float AAIDragon::InternalTakePointDamage(float Damage, struct FPointDamageEvent const& PointDamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+float AAIDragon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float OutDamage = Super::InternalTakePointDamage(Damage, PointDamageEvent, EventInstigator, DamageCauser);
+	float OutDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	if (HasAuthority())
 	{
-		if (!IsDead())
+		if (!HealthComponent->IsDead())
 		{
-			HealthCurrent = FMath::Max(HealthCurrent - OutDamage, 0.0f);
-			OnRep_CurrentHealth();
+			HealthComponent->DecreaseHealth(DamageAmount);
+			HealthComponent->OnRep_CurrentHealth();
 
-			PlayAnimMontage(GetRandomHitAnimation());
+			//PlayAnimMontage(GetRandomHitAnimation());
 			BP_OnDamageTaken();
 		}
 	}
 	else
 	{
-		PlayAnimMontage(GetRandomHitAnimation());
+		//PlayAnimMontage(GetRandomHitAnimation());
 		BP_OnDamageTaken();
 	}
 
 	return OutDamage;
 }
 
-void AAIDragon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+float AAIDragon::InternalTakePointDamage(float Damage, struct FPointDamageEvent const& PointDamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	float OutDamage = Super::InternalTakePointDamage(Damage, PointDamageEvent, EventInstigator, DamageCauser);
 
-	DOREPLIFETIME(AAIDragon, HealthCurrent);
+	if (HasAuthority())
+	{
+		if (!HealthComponent->IsDead())
+		{
+			HealthComponent->DecreaseHealth(OutDamage);
+			HealthComponent->OnRep_CurrentHealth();
+
+			//PlayAnimMontage(GetRandomHitAnimation());
+			BP_OnDamageTaken();
+		}
+	}
+	else
+	{
+		//PlayAnimMontage(GetRandomHitAnimation());
+		BP_OnDamageTaken();
+	}
+
+	return OutDamage;
 }
+
+float AAIDragon::InternalTakeRadialDamage(float Damage, FRadialDamageEvent const& RadialDamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float OutDamage = Super::InternalTakeRadialDamage(Damage, RadialDamageEvent, EventInstigator, DamageCauser);
+
+	if (HasAuthority())
+	{
+		if (!HealthComponent->IsDead())
+		{
+			HealthComponent->DecreaseHealth(OutDamage);
+			HealthComponent->OnRep_CurrentHealth();
+
+			//PlayAnimMontage(GetRandomHitAnimation());
+			BP_OnDamageTaken();
+		}
+	}
+	else
+	{
+		//PlayAnimMontage(GetRandomHitAnimation());
+		BP_OnDamageTaken();
+	}
+
+	return OutDamage;
+}
+

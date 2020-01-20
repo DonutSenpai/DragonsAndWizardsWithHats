@@ -16,6 +16,7 @@ public:
 
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
 
+	UFUNCTION()
 	void OnDie();
 
 	class AAIController* GetAIController() const;
@@ -32,15 +33,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	class UAnimMontage* GetRandomDeathAnimation() const;
 
-	UFUNCTION(BlueprintPure)
-	bool IsDead() const;
-
-	UFUNCTION(BlueprintPure)
-	FORCEINLINE float GetHealth() const { return HealthCurrent; };
-
 protected:
-	UFUNCTION()
-	void OnRep_CurrentHealth();
+
+	UPROPERTY(EditDefaultsOnly, Category = Health)
+	class UWADHealthComponent* HealthComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	TArray<class UAnimMontage*> HitReactions;
@@ -48,16 +44,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	TArray<class UAnimMontage*> DeathAnims;
 
-	UPROPERTY(EditAnywhere, Category = Health)
-	float Health = 100.0f;
-	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth)
-	float HealthCurrent = 100.0f;
-
 	bool bDead = false;
 
 	UFUNCTION()
 	void DoRagdoll();
 
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 	virtual float InternalTakePointDamage(float Damage, struct FPointDamageEvent const& PointDamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual float InternalTakeRadialDamage(float Damage, FRadialDamageEvent const& RadialDamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };
 
