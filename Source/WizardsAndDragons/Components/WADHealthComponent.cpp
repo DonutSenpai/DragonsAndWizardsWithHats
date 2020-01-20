@@ -55,7 +55,7 @@ void UWADHealthComponent::DecreaseHealth(float Value)
 		CurrentHealth -= Value;
 		CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
 		OnRep_CurrentHealth();
-		GetWorld()->GetTimerManager().SetTimer(InvincibleTimer, this, &UWADHealthComponent::ToggleInvincibilityOff, 1.0f, false);	
+		GetWorld()->GetTimerManager().SetTimer(InvincibleTimer, this, &UWADHealthComponent::ToggleInvincibilityOff, 1.0f, false);
 	}
 }
 

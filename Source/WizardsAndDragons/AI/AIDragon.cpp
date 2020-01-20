@@ -33,9 +33,8 @@ bool AAIDragon::ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, 
 
 void AAIDragon::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
 {
-		Super::GetActorEyesViewPoint(OutLocation, OutRotation);
+	Super::GetActorEyesViewPoint(OutLocation, OutRotation);
 }
-
 
 void AAIDragon::OnDie()
 {
@@ -148,7 +147,5 @@ float AAIDragon::InternalTakeRadialDamage(float Damage, FRadialDamageEvent const
 		//PlayAnimMontage(GetRandomHitAnimation());
 		BP_OnDamageTaken();
 	}
-
 	return OutDamage;
 }
-
