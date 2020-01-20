@@ -34,7 +34,7 @@ public:
 		class UAnimMontage* GetRandomDeathAnimation() const;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Health)
 		class UWADHealthComponent* HealthComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
