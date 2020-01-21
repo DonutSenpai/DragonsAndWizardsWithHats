@@ -56,6 +56,8 @@ void UWADHealthComponent::DecreaseHealth(float Value)
 		CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
 		OnRep_CurrentHealth();
 		GetWorld()->GetTimerManager().SetTimer(InvincibleTimer, this, &UWADHealthComponent::ToggleInvincibilityOff, 1.0f, false);
+
+		UE_LOG(LogTemp, Warning, TEXT("Health was decreased by: %f"), Value);
 	}
 }
 

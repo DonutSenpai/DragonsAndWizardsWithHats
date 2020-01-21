@@ -52,7 +52,6 @@ void USpellTargetSystemComponent::CastSpell()
 
 	SelectedSpell->Server_CastSpell(SpellTarget->GetActorLocation());
 	StopSpellTargetSystem();
-	
 
 }
 

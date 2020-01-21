@@ -38,6 +38,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = SpellSlots)
 	TArray<class USpellBase*> SpellSlots;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UWADHealthComponent* HealthComponent;
+
 protected:
 	void Turn(float Rate);
 	void LookUp(float Rate);

@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "../SpellTargetSystem/SpellTargetSystemComponent.h"
 #include "WADPlayerController.h"
+#include "../Components/WADHealthComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AWizardsAndDragonsCharacter
@@ -47,6 +48,10 @@ AWizardsAndDragonsCharacter::AWizardsAndDragonsCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	HealthComponent = CreateDefaultSubobject<UWADHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent->SetIsReplicated(true);
+
 }
 
 void AWizardsAndDragonsCharacter::BeginPlay()

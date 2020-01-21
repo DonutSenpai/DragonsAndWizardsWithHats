@@ -26,6 +26,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
 	float Cooldown = 1.0f;
 
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
+	float Damage = 1.f;
+
 	//The replicated VFX and/or Sound effect when the spell is cast
 	//@TargetLocation the location of impact(Where the spell should hit)
 	UFUNCTION(BlueprintImplementableEvent)
@@ -35,9 +38,13 @@ public:
 	void Multicast_OnCastSpellEffects(FVector TargetLocation);
 
 	//Always call the Super function, it handles the cooldown automatically
-	//Should return wether it successfully casts the spell or not
-	UFUNCTION(Server, Reliable, BlueprintCallable)
+	UFUNCTION(Server, Reliable)
 	virtual void Server_CastSpell(FVector TargetLocation);
+
+	//Deals damage instantly in radius AOE when called. Separate event from cast spell because it might want to be timed to an effect etc
+	//Can be overridden to have single target damage instead of AOE
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	virtual void Server_DealDamage(FVector TargetLocation);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool GetIsOnCooldown() { return CurrentCooldown > 0.0f; }
