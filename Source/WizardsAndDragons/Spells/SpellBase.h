@@ -53,6 +53,12 @@ public:
 	FORCEINLINE float GetCurrentCooldown() { return CurrentCooldown; }
 
 protected:
+
+	//Gets possible spell target actors in radius. This function ASSUMES that
+	//all PAWNS are damageable(aka have a health component)
+	UFUNCTION(BlueprintCallable, Category = SpellHelperFunctions)
+	TArray<AActor*> GetSpellTargetsInRadius(FVector TargetLocation);
+
 	UPROPERTY(Replicated)
 	float CurrentCooldown = 0.0f;
 

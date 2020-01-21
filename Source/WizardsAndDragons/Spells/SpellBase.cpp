@@ -21,17 +21,8 @@ void USpellBase::Multicast_OnCastSpellEffects_Implementation(FVector TargetLocat
 
 void USpellBase::Server_DealDamage_Implementation(FVector TargetLocation)
 {
-
-	TArray<AActor*> IgnoredActors;
-	IgnoredActors.Add(GetOwner());
+	TArray<AActor*> OverlappedActors = GetSpellTargetsInRadius(TargetLocation);	
 	
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-
-	TArray<AActor*> OverlappedActors;
-	
-	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), TargetLocation, Radius, ObjectTypes, nullptr, IgnoredActors, OverlappedActors);
-
 	for (AActor* OverlappedActor : OverlappedActors)
 	{
 		if (UWADHealthComponent* HealthComponent = OverlappedActor->FindComponentByClass<UWADHealthComponent>())
@@ -39,6 +30,21 @@ void USpellBase::Server_DealDamage_Implementation(FVector TargetLocation)
 			HealthComponent->DecreaseHealth(Damage);
 		}
 	}
+}
+
+TArray<AActor*> USpellBase::GetSpellTargetsInRadius(FVector TargetLocation)
+{
+	TArray<AActor*> IgnoredActors;
+	IgnoredActors.Add(GetOwner());
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+	TArray<AActor*> OverlappedActors;
+
+	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), TargetLocation, Radius, ObjectTypes, nullptr, IgnoredActors, OverlappedActors);
+
+	return OverlappedActors;
 }
 
 void USpellBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
