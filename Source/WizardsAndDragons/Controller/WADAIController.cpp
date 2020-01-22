@@ -135,6 +135,7 @@ void AWADAIController::AddNewTarget(AActor* NewTarget, bool bVisible)
 	Targets.Add(TargetInfo);
 }
 
+
 void AWADAIController::AddAggro(AActor* TargetActor, float Aggro)
 {
 	if (!HasTarget(TargetActor))
