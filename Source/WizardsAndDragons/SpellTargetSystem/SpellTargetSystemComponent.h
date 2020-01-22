@@ -2,6 +2,8 @@
 #include "Components/ActorComponent.h"
 #include "SpellTargetSystemComponent.generated.h"
 
+
+//TO DO: Limit targeting to the actual range of the spell.
 UCLASS(BlueprintType, Blueprintable)
 class USpellTargetSystemComponent : public UActorComponent
 {

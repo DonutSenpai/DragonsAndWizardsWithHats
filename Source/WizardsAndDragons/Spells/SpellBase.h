@@ -5,6 +5,7 @@
 
 class USlateBrushAsset;
 
+//This is a base class that contains absolute bare minimum functionality.
 UCLASS(Blueprintable, BlueprintType)
 class USpellBase : public UActorComponent
 {
@@ -37,7 +38,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnCastSpellEffects(FVector TargetLocation);
 
-	//Always call the Super function, it handles the cooldown automatically
+	//Always call the Super function, it handles the cooldown automatically.
 	UFUNCTION(Server, Reliable)
 	virtual void Server_CastSpell(FVector TargetLocation);
 
