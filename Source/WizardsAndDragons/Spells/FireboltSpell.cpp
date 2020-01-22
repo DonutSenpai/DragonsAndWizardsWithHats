@@ -3,11 +3,15 @@
 #include "../Components/WADHealthComponent.h"
 
 
-
-void UFireboltSpell::Server_CastSpell_Implementation(FVector TargetLocation)
+void UFireboltSpell::InternalCastSpell(FVector TargetLocation)
 {
-	Super::Server_CastSpell(TargetLocation);
+	UWorld* World = GetWorld();
 
+	if (World == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Can't get UWorld, it is nullptr."));
+		return;
+	}
 
 	TArray<AActor*> IgnoredActors;
 	IgnoredActors.Add(GetOwner());
@@ -17,7 +21,7 @@ void UFireboltSpell::Server_CastSpell_Implementation(FVector TargetLocation)
 
 	TArray<AActor*> OverlappedActors;
 
-	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), TargetLocation, Radius, ObjectTypes, nullptr, IgnoredActors, OverlappedActors);
+	UKismetSystemLibrary::SphereOverlapActors(World, TargetLocation, Radius, ObjectTypes, nullptr, IgnoredActors, OverlappedActors);
 
 	if (OverlappedActors.Num() > 1)
 	{
@@ -35,20 +39,22 @@ void UFireboltSpell::Server_CastSpell_Implementation(FVector TargetLocation)
 			}
 		}
 	}
-	else
+	else if (OverlappedActors.Num() == 1)
 	{
 		SpellTarget = OverlappedActors[0];
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(DealDamageHandle, this, &UFireboltSpell::DealDamage, 0.0f, false, TravelTime);
-	OnCastSpellEffect(SpellTarget, TravelTime);
+	OnCastSpellEffect(TravelTime, TargetLocation, SpellTarget);
+
 }
 
-void UFireboltSpell::Server_DealDamage_Implementation(FVector TargetLocation)
+void UFireboltSpell::InternalDealDamage(FVector TargetLocation)
 {
 	if (UWADHealthComponent* HealthComponent = SpellTarget->FindComponentByClass<UWADHealthComponent>())
 	{
-		HealthComponent->DecreaseHealth(Damage);
+		HealthComponent->DecreaseHealth(Damage, GetOwner());
+		UE_LOG(LogTemp, Warning, TEXT("Dealt damage"));
 	}
 
 	SpellTarget = nullptr;
@@ -56,6 +62,7 @@ void UFireboltSpell::Server_DealDamage_Implementation(FVector TargetLocation)
 
 void UFireboltSpell::DealDamage()
 {
+	UE_LOG(LogTemp, Error, TEXT("DEAL DAMAGE EVENT HAPPENED"));
 	if (SpellTarget)
 	{
 		Server_DealDamage(FVector::ZeroVector);

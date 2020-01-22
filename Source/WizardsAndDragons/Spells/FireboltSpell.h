@@ -19,13 +19,13 @@ public:
 	AActor* SpellTarget = nullptr;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnCastSpellEffect(AActor* TargetActor, float TimeToTravel);
+	void OnCastSpellEffect(float TimeToTravel, FVector TargetLocation = FVector::ZeroVector, AActor* TargetActor = nullptr);
 
-	UFUNCTION()
-	virtual void Server_CastSpell_Implementation(FVector TargetLocation) override;
+protected:
+	
+	virtual void InternalCastSpell(FVector TargetLocation) override;
 
-	UFUNCTION()
-	virtual void Server_DealDamage_Implementation(FVector TargetLocation) override;
+	virtual void InternalDealDamage(FVector TargetLocation) override;
 
 private:
 

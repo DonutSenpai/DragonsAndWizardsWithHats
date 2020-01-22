@@ -30,22 +30,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
 	float Damage = 1.f;
 
-	//The replicated VFX and/or Sound effect when the spell is cast
-	//@TargetLocation the location of impact(Where the spell should hit)
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnCastSpellEffects(FVector TargetLocation);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_OnCastSpellEffects(FVector TargetLocation);
-
-	//Always call the Super function, it handles the cooldown automatically.
+	//Handles the cooldown automatically.
 	UFUNCTION(Server, Reliable)
-	virtual void Server_CastSpell(FVector TargetLocation);
+	void Server_CastSpell(FVector TargetLocation);
 
 	//Deals damage instantly in radius AOE when called. Separate event from cast spell because it might want to be timed to an effect etc
 	//Can be overridden to have single target damage instead of AOE
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	virtual void Server_DealDamage(FVector TargetLocation);
+	void Server_DealDamage(FVector TargetLocation);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool GetIsOnCooldown() { return CurrentCooldown > 0.0f; }
@@ -54,6 +46,13 @@ public:
 	FORCEINLINE float GetCurrentCooldown() { return CurrentCooldown; }
 
 protected:
+
+	UFUNCTION()
+	virtual void InternalCastSpell(FVector TargetLocation);
+
+	UFUNCTION()
+	virtual void InternalDealDamage(FVector TargetLocation);
+
 
 	//Gets possible spell target actors in radius. This function ASSUMES that
 	//all PAWNS are damageable(aka have a health component)

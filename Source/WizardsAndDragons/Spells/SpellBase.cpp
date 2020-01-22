@@ -10,24 +10,28 @@ void USpellBase::Server_CastSpell_Implementation(FVector TargetLocation)
 
 	CurrentCooldown = Cooldown;
 	GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &USpellBase::CountDownCooldown, 0.1f, true, 0.0f);
-	Multicast_OnCastSpellEffects(TargetLocation);	
 
+	InternalCastSpell(TargetLocation);
 }
-
-void USpellBase::Multicast_OnCastSpellEffects_Implementation(FVector TargetLocation)
-{
-	OnCastSpellEffects(TargetLocation);
-}
-
 void USpellBase::Server_DealDamage_Implementation(FVector TargetLocation)
 {
-	TArray<AActor*> OverlappedActors = GetSpellTargetsInRadius(TargetLocation);	
-	
+	InternalDealDamage(TargetLocation);
+}
+
+void USpellBase::InternalCastSpell(FVector TargetLocation)
+{
+
+}
+
+void USpellBase::InternalDealDamage(FVector TargetLocation)
+{
+	TArray<AActor*> OverlappedActors = GetSpellTargetsInRadius(TargetLocation);
+
 	for (AActor* OverlappedActor : OverlappedActors)
 	{
 		if (UWADHealthComponent* HealthComponent = OverlappedActor->FindComponentByClass<UWADHealthComponent>())
 		{
-			HealthComponent->DecreaseHealth(Damage);
+			HealthComponent->DecreaseHealth(Damage, GetOwner());
 		}
 	}
 }
