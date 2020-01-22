@@ -7,9 +7,6 @@
 UWADHealthComponent::UWADHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
-	// Get the owner of the component
-	AActor* Owner = GetOwner();
 }
 
 // Called when the game starts
@@ -18,6 +15,9 @@ void UWADHealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentHealth = MaxHealth;
+
+	// Get the owner of the component
+	AActor* Owner = GetOwner();
 }
 
 bool UWADHealthComponent::GetInvincible() const
@@ -47,13 +47,14 @@ void UWADHealthComponent::ModifyHealth(float Value)
 	OnRep_CurrentHealth();
 }
 
-void UWADHealthComponent::DecreaseHealth(float Value)
+void UWADHealthComponent::DecreaseHealth(float Value, AActor* InstigatingActor)
 {
 	if (!bInvincible)
 	{
 		bInvincible = true;
 		CurrentHealth -= Value;
 		CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
+		OnHealthChanged.Broadcast(Value, InstigatingActor);
 		OnRep_CurrentHealth();
 		GetWorld()->GetTimerManager().SetTimer(InvincibleTimer, this, &UWADHealthComponent::ToggleInvincibilityOff, 1.0f, false);
 
@@ -61,12 +62,13 @@ void UWADHealthComponent::DecreaseHealth(float Value)
 	}
 }
 
-void UWADHealthComponent::IncreaseHealth(float Value)
+void UWADHealthComponent::IncreaseHealth(float Value, AActor* InstigatingActor)
 {
 	if (CurrentHealth < MaxHealth)
 	{
 		CurrentHealth += Value;
 		CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
+		OnHealthChanged.Broadcast(Value, InstigatingActor);
 		OnRep_CurrentHealth();
 	}
 }

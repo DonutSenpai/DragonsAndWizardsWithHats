@@ -5,6 +5,7 @@
 #include "WADHealthComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeathEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChangedEvent, float, ChangeValue, AActor*, InstigatingActor);
 
 UCLASS(Blueprintable)
 class  UWADHealthComponent : public UActorComponent
@@ -37,11 +38,19 @@ public:
 
 	//  Remove value CurrentHealth
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		void DecreaseHealth(float Value);
+		void DecreaseHealth(float Value, AActor* InstigatingActor);
+
+	//  Blueprint event to run on decreased health
+	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
+		void OnDecreaseHealth(float Value, AActor* InstigatingActor);
 
 	// Add value to CurrentHealth
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		void IncreaseHealth(float Value);
+		void IncreaseHealth(float Value, AActor* InstigatingActor);
+
+	// Blueprint event to run on increased health
+	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
+		void OnIncreaseHealth(float Value, AActor* InstigatingActor);
 
 	UFUNCTION(BlueprintPure)
 		bool IsDead() const;
@@ -49,6 +58,10 @@ public:
 	// Fires when health reaches zero
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 		FDeathEvent OnDeath;
+
+	// Fires when health reaches zero
+	UPROPERTY(BlueprintAssignable, Category = "Health")
+		FHealthChangedEvent OnHealthChanged;
 
 	UFUNCTION()
 		void OnRep_CurrentHealth();

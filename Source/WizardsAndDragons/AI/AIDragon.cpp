@@ -87,7 +87,7 @@ float AAIDragon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 	{
 		if (!HealthComponent->IsDead())
 		{
-			HealthComponent->DecreaseHealth(DamageAmount);
+			HealthComponent->DecreaseHealth(DamageAmount, DamageCauser);
 			HealthComponent->OnRep_CurrentHealth();
 
 			//PlayAnimMontage(GetRandomHitAnimation());
@@ -111,7 +111,7 @@ float AAIDragon::InternalTakePointDamage(float Damage, struct FPointDamageEvent 
 	{
 		if (!HealthComponent->IsDead())
 		{
-			HealthComponent->DecreaseHealth(OutDamage);
+			HealthComponent->DecreaseHealth(OutDamage, DamageCauser);
 			HealthComponent->OnRep_CurrentHealth();
 
 			//PlayAnimMontage(GetRandomHitAnimation());
@@ -135,7 +135,7 @@ float AAIDragon::InternalTakeRadialDamage(float Damage, FRadialDamageEvent const
 	{
 		if (!HealthComponent->IsDead())
 		{
-			HealthComponent->DecreaseHealth(OutDamage);
+			HealthComponent->DecreaseHealth(OutDamage, DamageCauser);
 			HealthComponent->OnRep_CurrentHealth();
 
 			//PlayAnimMontage(GetRandomHitAnimation());

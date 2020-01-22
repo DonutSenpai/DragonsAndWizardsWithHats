@@ -53,7 +53,10 @@ public:
 
 	bool HasTarget(AActor* TargetActor) const;
 	void AddNewTarget(AActor* NewTarget, bool bVisible);
+
+	UFUNCTION(BlueprintCallable)
 	void AddAggro(AActor* TargetActor, float Aggro);
+
 	void UpdateTarget(AActor* TargetActor, bool bVisible);
 
 protected:
