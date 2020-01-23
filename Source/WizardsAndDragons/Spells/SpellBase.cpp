@@ -13,9 +13,9 @@ void USpellBase::Server_CastSpell_Implementation(FVector TargetLocation)
 
 	InternalCastSpell(TargetLocation);
 }
-void USpellBase::Server_DealDamage_Implementation(FVector TargetLocation)
+void USpellBase::Server_DealDamage_Implementation(const TArray<AActor*> &SpellTargets)
 {
-	InternalDealDamage(TargetLocation);
+	InternalDealDamage(SpellTargets);
 }
 
 void USpellBase::InternalCastSpell(FVector TargetLocation)
@@ -23,13 +23,11 @@ void USpellBase::InternalCastSpell(FVector TargetLocation)
 
 }
 
-void USpellBase::InternalDealDamage(FVector TargetLocation)
+void USpellBase::InternalDealDamage(const TArray<AActor*> &SpellTargets)
 {
-	TArray<AActor*> OverlappedActors = GetSpellTargetsInRadius(TargetLocation);
-
-	for (AActor* OverlappedActor : OverlappedActors)
+	for (AActor* SpellTarget : SpellTargets)
 	{
-		if (UWADHealthComponent* HealthComponent = OverlappedActor->FindComponentByClass<UWADHealthComponent>())
+		if (UWADHealthComponent* HealthComponent = SpellTarget->FindComponentByClass<UWADHealthComponent>())
 		{
 			HealthComponent->DecreaseHealth(Damage, GetOwner());
 		}

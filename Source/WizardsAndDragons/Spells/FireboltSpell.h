@@ -3,8 +3,10 @@
 #include "SpellBase.h"
 #include "FireboltSpell.generated.h"
 
-//You should only ever be able to have one firebolt cast at a time, 
-//meaning that the cooldown needs to be longer than the time it takes to hit the opponent
+
+//Firebolt: Target seeking, deals damage to the (one) target closest to the center of the spell.
+//TIP: You should only ever be able to have one firebolt cast at a time, 
+//meaning that the cooldown needs to be longer than the time it takes to hit the opponent.
 UCLASS()
 class UFireboltSpell : public USpellBase
 {
@@ -25,7 +27,7 @@ protected:
 	
 	virtual void InternalCastSpell(FVector TargetLocation) override;
 
-	virtual void InternalDealDamage(FVector TargetLocation) override;
+	virtual void InternalDealDamage(const TArray<AActor*> &SpellTargets) override;
 
 private:
 
