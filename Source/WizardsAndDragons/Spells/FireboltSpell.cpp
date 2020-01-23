@@ -44,7 +44,7 @@ void UFireboltSpell::InternalCastSpell(FVector TargetLocation)
 		SpellTarget = OverlappedActors[0];
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(DealDamageHandle, this, &UFireboltSpell::DealDamage, 0.0f, false, TravelTime);
+	World->GetTimerManager().SetTimer(DealDamageHandle, this, &UFireboltSpell::DealDamage, 0.1f, false, TravelTime);
 	OnCastSpellEffect(TravelTime, TargetLocation, SpellTarget);
 
 }
