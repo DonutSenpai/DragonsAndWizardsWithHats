@@ -15,9 +15,22 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
 	float TravelTime = 0.75f;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	AActor* SpellTarget = nullptr;
 
-	virtual void Server_CastSpell_Implementation(FVector TargetLocation) override;
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnCastSpellEffect(float TimeToTravel, FVector TargetLocation = FVector::ZeroVector, AActor* TargetActor = nullptr);
+
+protected:
+	
+	virtual void InternalCastSpell(FVector TargetLocation) override;
+
+	virtual void InternalDealDamage(FVector TargetLocation) override;
+
+private:
+
+	void DealDamage();
+
+	FTimerHandle DealDamageHandle;
 
 };
