@@ -34,6 +34,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool GetIsSystemActive(){ return bIsSystemActive; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetIsSystemAlreadyActive(USpellBase* IsSpellActive);
+
 
 protected:
 

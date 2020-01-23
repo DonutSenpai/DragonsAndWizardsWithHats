@@ -7,7 +7,7 @@
 USpellTargetSystemComponent::USpellTargetSystemComponent()
 {
 }
- 
+
 
 void USpellTargetSystemComponent::StartSpellTargetSystem(USpellBase* Spell)
 {
@@ -19,6 +19,11 @@ void USpellTargetSystemComponent::StartSpellTargetSystem(USpellBase* Spell)
 	if (Spell == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("You can't start the spell target system without a valid spell class as a parameter."));
+	}
+
+	if (SpellTarget)
+	{
+		StopSpellTargetSystem();
 	}
 
 	SelectedSpell = Spell;
@@ -44,6 +49,7 @@ void USpellTargetSystemComponent::StopSpellTargetSystem()
 	GetWorld()->GetTimerManager().ClearTimer(SpellTargetHandle);
 	SpellTarget->Destroy();
 	bIsSystemActive = false;
+	SelectedSpell = nullptr;
 }
 
 void USpellTargetSystemComponent::CastSpell()
@@ -52,6 +58,18 @@ void USpellTargetSystemComponent::CastSpell()
 
 	SelectedSpell->Server_CastSpell(SpellTarget->GetActorLocation());
 	StopSpellTargetSystem();
+
+}
+
+bool USpellTargetSystemComponent::GetIsSystemAlreadyActive(USpellBase* IsSpellActive)
+{
+	if (SelectedSpell)
+	{
+
+		return SelectedSpell->Name == IsSpellActive->Name;
+	}
+
+	return false;
 
 }
 
@@ -66,10 +84,10 @@ void USpellTargetSystemComponent::SimulateSpellTarget()
 
 	SpellTarget->SetActorLocation(OutHitMousePosition.ImpactPoint);
 
-//	FVector Location = SpellTarget->GetActorLocation();
-	
+	//	FVector Location = SpellTarget->GetActorLocation();
 
-	//UE_LOG(LogTemp, Warning, TEXT("Spell Target position: X: %f Y: %f Z: %f"), Location.X, Location.Y, StartLocation.Z);
+
+		//UE_LOG(LogTemp, Warning, TEXT("Spell Target position: X: %f Y: %f Z: %f"), Location.X, Location.Y, StartLocation.Z);
 
 
 }
