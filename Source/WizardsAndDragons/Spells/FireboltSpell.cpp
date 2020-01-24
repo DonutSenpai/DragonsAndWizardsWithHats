@@ -5,7 +5,6 @@
 
 void UFireboltSpell::InternalCastSpell(FVector TargetLocation)
 {
-
 	TArray<AActor*> OverlappedActors = GetSpellTargetsInRadius(TargetLocation);
 
 	if (OverlappedActors.Num() > 1)
@@ -30,7 +29,7 @@ void UFireboltSpell::InternalCastSpell(FVector TargetLocation)
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(DealDamageHandle, this, &UFireboltSpell::DealDamage, TravelTime, false);
-	OnCastSpellEffect(TravelTime, TargetLocation, SpellTarget);
+	OnCastSpellEffectInternal(TravelTime, TargetLocation, SpellTarget);
 
 }
 
@@ -42,6 +41,11 @@ void UFireboltSpell::InternalDealDamage(const TArray<AActor*> &SpellTargets)
 	}
 
 	SpellTarget = nullptr;
+}
+
+void UFireboltSpell::OnCastSpellEffectInternal_Implementation(float TimeToTravel, FVector TargetLocation /*= FVector::ZeroVector*/, AActor* TargetActor /*= nullptr*/)
+{
+	OnCastSpellEffect(TimeToTravel, TargetLocation, TargetActor);
 }
 
 void UFireboltSpell::DealDamage()
