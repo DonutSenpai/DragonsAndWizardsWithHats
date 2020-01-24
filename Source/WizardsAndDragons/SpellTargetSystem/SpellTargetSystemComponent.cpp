@@ -38,6 +38,7 @@ void USpellTargetSystemComponent::StartSpellTargetSystem(USpellBase* Spell)
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Spell Target didnt spawn correctly"));
+		return;
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(SpellTargetHandle, this, &USpellTargetSystemComponent::SimulateSpellTarget, 0.03f, true, 0.0f);
@@ -47,7 +48,12 @@ void USpellTargetSystemComponent::StartSpellTargetSystem(USpellBase* Spell)
 void USpellTargetSystemComponent::StopSpellTargetSystem()
 {
 	GetWorld()->GetTimerManager().ClearTimer(SpellTargetHandle);
-	SpellTarget->Destroy();
+
+	if (SpellTarget)
+	{
+		SpellTarget->Destroy();
+	}
+
 	bIsSystemActive = false;
 	SelectedSpell = nullptr;
 }
@@ -71,6 +77,17 @@ bool USpellTargetSystemComponent::GetIsSystemAlreadyActive(USpellBase* IsSpellAc
 
 	return false;
 
+}
+
+bool USpellTargetSystemComponent::CanActivateSystem(USpellBase* SpellToActivate)
+{
+	if (SpellToActivate->GetIsOnCooldown())
+		return false;
+
+	if (SelectedSpell && SelectedSpell->Name == SpellToActivate->Name)
+		return false;
+
+	return true;
 }
 
 void USpellTargetSystemComponent::SimulateSpellTarget()

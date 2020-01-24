@@ -37,6 +37,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetIsSystemAlreadyActive(USpellBase* IsSpellActive);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool CanActivateSystem(USpellBase* SpellToActivate);
+
 
 protected:
 
