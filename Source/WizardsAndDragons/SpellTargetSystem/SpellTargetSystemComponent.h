@@ -15,6 +15,9 @@ public:
 	UPROPERTY(NoClear, EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ASpellTarget> SpellTargetClass;
 
+	UPROPERTY(NoClear, EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class ASpellTarget> SpellTargetRangeIndicatorClass;
+
 	UFUNCTION(BlueprintCallable, Category = SpellTargetSystem)
 	void StartSpellTargetSystem(class USpellBase* Spell);
 
@@ -27,6 +30,9 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite)
 	class ASpellTarget* SpellTarget = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+	class ASpellTarget* SpellTargetRangeIndicator = nullptr;
 
 	UFUNCTION(BlueprintCallable)
 	void CastSpell();
@@ -53,4 +59,7 @@ protected:
 	void SimulateSpellTarget();
 
 	FHitResult OutHitMousePosition;
+
+	//Checks stuff like if the target is in the range of the spell
+	bool CanCastSpell();
 };
