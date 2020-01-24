@@ -7,6 +7,7 @@
 UWADHealthComponent::UWADHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	bEditableWhenInherited = true;
 }
 
 // Called when the game starts
@@ -25,12 +26,12 @@ bool UWADHealthComponent::GetInvincible() const
 	return bInvincible;
 }
 
-int UWADHealthComponent::GetCurrentHealth() const
+float UWADHealthComponent::GetCurrentHealth() const
 {
 	return CurrentHealth;
 }
 
-int UWADHealthComponent::GetMaxHealth() const
+float UWADHealthComponent::GetMaxHealth() const
 {
 	return MaxHealth;
 }

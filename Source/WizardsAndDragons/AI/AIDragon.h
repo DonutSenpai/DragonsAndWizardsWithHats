@@ -33,20 +33,35 @@ public:
 	UFUNCTION(BlueprintCallable)
 		class UAnimMontage* GetRandomDeathAnimation() const;
 
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Health)
+	UFUNCTION(BlueprintCallable)
+		class UAnimMontage* GetRandomMeleeAnimation() const;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Health)
 		class UWADHealthComponent* HealthComponent;
 
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 		TArray<class UAnimMontage*> HitReactions;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 		TArray<class UAnimMontage*> DeathAnims;
 
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+		TArray<class UAnimMontage*> MeleeAnims;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+		bool bIsAttacking = false;
+
 	bool bDead = false;
 
 	UFUNCTION()
 		void DoRagdoll();
+
+	UFUNCTION(BlueprintCallable)
+		void MeleeAttack();
+
+	UFUNCTION(BlueprintCallable)
+		void RangedAttack();
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 

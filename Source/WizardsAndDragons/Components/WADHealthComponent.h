@@ -22,11 +22,11 @@ public:
 
 	// Get the current health of the character
 	UFUNCTION(BlueprintPure, Category = "Health")
-		int GetCurrentHealth() const;
+		float GetCurrentHealth() const;
 
 	// Get the max health of the character
 	UFUNCTION(BlueprintPure, Category = "Health")
-		int GetMaxHealth() const;
+		float GetMaxHealth() const;
 
 	// Change Actor MaxHealth
 	UFUNCTION(BlueprintCallable, Category = "Health")
@@ -68,7 +68,7 @@ public:
 
 protected:
 	// The current value of heatlh
-	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, VisibleAnywhere, Category = "Health")
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, VisibleAnywhere)
 		float  CurrentHealth;
 
 	// The max health of the component

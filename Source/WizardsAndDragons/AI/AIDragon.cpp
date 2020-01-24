@@ -71,12 +71,34 @@ class UAnimMontage* AAIDragon::GetRandomDeathAnimation() const
 	return DeathAnims[FMath::RandRange(0, DeathAnims.Num() - 1)];
 }
 
+class UAnimMontage* AAIDragon::GetRandomMeleeAnimation() const
+{
+	return MeleeAnims[FMath::RandRange(0, MeleeAnims.Num() - 1)];
+}
+
 void AAIDragon::DoRagdoll()
 {
 	GetCapsuleComponent()->SetCollisionProfileName(FName(TEXT("NoCollision")));
 	GetMesh()->SetCollisionProfileName(FName(TEXT("PhysicsActor")));
 	GetMesh()->SetSimulatePhysics(true);
 	SetLifeSpan(10.0f);
+}
+
+void AAIDragon::MeleeAttack()
+{
+	if (!bIsAttacking)
+	{
+		bIsAttacking = true;
+
+		PlayAnimMontage(GetRandomMeleeAnimation());
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Melee"));
+	}
+}
+
+void AAIDragon::RangedAttack()
+{
+	bIsAttacking = true;
 }
 
 float AAIDragon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
