@@ -29,6 +29,10 @@ protected:
 
 	virtual void InternalDealDamage(const TArray<AActor*> &SpellTargets) override;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void OnCastSpellEffectInternal(float TimeToTravel, FVector TargetLocation = FVector::ZeroVector, AActor* TargetActor = nullptr);
+
+
 private:
 
 	void DealDamage();
