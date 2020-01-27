@@ -83,6 +83,8 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		void ToggleInvincibilityOff();
 
+	AActor* Owner;
+
 private:
 	FTimerHandle InvincibleTimer;
 

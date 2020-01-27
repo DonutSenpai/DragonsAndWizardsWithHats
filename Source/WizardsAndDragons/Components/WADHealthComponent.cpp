@@ -18,7 +18,7 @@ void UWADHealthComponent::BeginPlay()
 	CurrentHealth = MaxHealth;
 
 	// Get the owner of the component
-	AActor* Owner = GetOwner();
+	Owner = GetOwner();
 }
 
 bool UWADHealthComponent::GetInvincible() const
@@ -50,7 +50,7 @@ void UWADHealthComponent::ModifyHealth(float Value)
 
 void UWADHealthComponent::DecreaseHealth(float Value, AActor* InstigatingActor)
 {
-	if (!bInvincible)
+	if (!bInvincible && InstigatingActor != Owner)
 	{
 		bInvincible = true;
 		CurrentHealth -= Value;
