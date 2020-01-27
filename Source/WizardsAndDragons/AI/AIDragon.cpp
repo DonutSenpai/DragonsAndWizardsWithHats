@@ -7,13 +7,16 @@
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
 #include "../Components/WADHealthComponent.h"
+#include "DragonProjectile.h"
 
 AAIDragon::AAIDragon()
 {
+	SetReplicates(true);
+
 	HealthComponent = CreateDefaultSubobject<UWADHealthComponent>(TEXT("HealthComponent"));
 	HealthComponent->SetIsReplicated(true);
 
-	SetReplicates(true);
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
 }
 
 void AAIDragon::BeginPlay()
@@ -34,6 +37,28 @@ bool AAIDragon::ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, 
 void AAIDragon::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
 {
 	Super::GetActorEyesViewPoint(OutLocation, OutRotation);
+}
+
+void AAIDragon::Fire(const FVector& StartLocation, const FVector& ForwardDirection, AActor* DamageCauser, AController* EventInstigator)
+{
+	if (ProjectileClass.Get() == nullptr)
+	{
+		return;
+	}
+
+	if (HasAuthority())
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		const FVector SpawnLocation = StartLocation + ForwardDirection * 200.0f;
+		const FRotator SpawnRotation = ForwardDirection.Rotation();
+		ADragonProjectile* NewProjectile = GetWorld()->SpawnActor<ADragonProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+	}
+
+	FHitResult Hit;
+	//WeaponSystem->OnFire.Broadcast(WeaponSystem, this, Hit);
 }
 
 void AAIDragon::OnDie()
@@ -91,14 +116,25 @@ void AAIDragon::MeleeAttack()
 		bIsAttacking = true;
 
 		PlayAnimMontage(GetRandomMeleeAnimation());
-
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Melee"));
 	}
 }
 
 void AAIDragon::RangedAttack()
 {
-	bIsAttacking = true;
+	if (!bIsAttacking)
+	{
+		bIsAttacking = true;
+
+		PlayAnimMontage(RangedAnim);
+
+		FHitResult Hit;
+		FVector StartLocation;
+		FRotator Forward;
+
+		GetActorEyesViewPoint(StartLocation, Forward);
+
+		Fire(StartLocation, Forward.Vector(), this, GetController());
+	}	
 }
 
 float AAIDragon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

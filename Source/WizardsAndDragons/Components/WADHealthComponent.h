@@ -59,7 +59,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 		FDeathEvent OnDeath;
 
-	// Fires when health reaches zero
+	// Fires when health has been changed
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 		FHealthChangedEvent OnHealthChanged;
 

@@ -3,6 +3,8 @@
 #include "GameFramework/Character.h"
 #include "AIDragon.generated.h"
 
+class ADragonProjectile;
+
 UCLASS()
 class AAIDragon : public ACharacter
 {
@@ -15,6 +17,11 @@ public:
 	virtual bool ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const override;
 
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
+
+	void Fire(const FVector& StartLocation, const FVector& ForwardDirection, AActor* DamageCauser, AController* EventInstigator);
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<ADragonProjectile> ProjectileClass;
 
 	UFUNCTION()
 		void OnDie();
@@ -36,7 +43,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		class UAnimMontage* GetRandomMeleeAnimation() const;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		class UWADHealthComponent* HealthComponent;
 
 protected:
@@ -49,8 +56,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 		TArray<class UAnimMontage*> MeleeAnims;
 
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+		class UAnimMontage* RangedAnim;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 		bool bIsAttacking = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		USceneComponent* ProjectileSpawnPoint;
 
 	bool bDead = false;
 
