@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "DragonProjectile.generated.h"
 
+class USphereComponent;
+
 UCLASS()
 class WIZARDSANDDRAGONS_API ADragonProjectile : public AActor
 {
@@ -18,6 +20,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = Movement)
+		USphereComponent* SphereComp;
 
 public:	
 	// Called every frame

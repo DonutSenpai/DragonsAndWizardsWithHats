@@ -13,19 +13,22 @@ AAIDragon::AAIDragon()
 {
 	SetReplicates(true);
 
-	HealthComponent = CreateDefaultSubobject<UWADHealthComponent>(TEXT("HealthComponent"));
-	HealthComponent->SetIsReplicated(true);
+	HealthComp = CreateDefaultSubobject<UWADHealthComponent>(TEXT("HealthComp"));
+	HealthComp->SetIsReplicated(true);
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
+	ProjectileSpawnPoint->SetupAttachment(RootComponent);
+	ProjectileSpawnPoint->SetRelativeLocation(FVector(120.0f, 0.0f, -40.0f));
 }
 
 void AAIDragon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (HealthComponent)
+	if (HealthComp)
 	{
-		HealthComponent->OnDeath.AddDynamic(this, &AAIDragon::OnDie);
+		HealthComp->OnDeath.AddDynamic(this, &AAIDragon::OnDie);
+		HealthComp->OnHealthChanged.AddDynamic(this, &AAIDragon::OnHit);
 	}
 }
 
@@ -39,7 +42,7 @@ void AAIDragon::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotatio
 	Super::GetActorEyesViewPoint(OutLocation, OutRotation);
 }
 
-void AAIDragon::Fire(const FVector& StartLocation, const FVector& ForwardDirection, AActor* DamageCauser, AController* EventInstigator)
+void AAIDragon::Fire(const FVector& StartLocation, const FRotator& ForwardRotation, AActor* DamageCauser, AController* EventInstigator)
 {
 	if (ProjectileClass.Get() == nullptr)
 	{
@@ -52,13 +55,11 @@ void AAIDragon::Fire(const FVector& StartLocation, const FVector& ForwardDirecti
 		SpawnParams.Owner = this;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		const FVector SpawnLocation = StartLocation + ForwardDirection * 200.0f;
-		const FRotator SpawnRotation = ForwardDirection.Rotation();
+		const FVector SpawnLocation = StartLocation;
+
+		const FRotator SpawnRotation = ForwardRotation;
 		ADragonProjectile* NewProjectile = GetWorld()->SpawnActor<ADragonProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
 	}
-
-	FHitResult Hit;
-	//WeaponSystem->OnFire.Broadcast(WeaponSystem, this, Hit);
 }
 
 void AAIDragon::OnDie()
@@ -75,7 +76,7 @@ void AAIDragon::OnDie()
 		}
 	}
 
-	//PlayAnimMontage(GetRandomDeathAnimation());
+	PlayAnimMontage(DeathAnim);
 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAIDragon::DoRagdoll, FMath::RandRange(0.25f, 0.5f), false);
@@ -89,11 +90,6 @@ AAIController* AAIDragon::GetAIController() const
 class UAnimMontage* AAIDragon::GetRandomHitAnimation() const
 {
 	return HitReactions[FMath::RandRange(0, HitReactions.Num() - 1)];
-}
-
-class UAnimMontage* AAIDragon::GetRandomDeathAnimation() const
-{
-	return DeathAnims[FMath::RandRange(0, DeathAnims.Num() - 1)];
 }
 
 class UAnimMontage* AAIDragon::GetRandomMeleeAnimation() const
@@ -111,99 +107,60 @@ void AAIDragon::DoRagdoll()
 
 void AAIDragon::MeleeAttack()
 {
-	if (!bIsAttacking)
+	if (bMeleeAttackReady)
 	{
-		bIsAttacking = true;
+		bMeleeAttackReady = false;
 
 		PlayAnimMontage(GetRandomMeleeAnimation());
+
+		GetWorld()->GetTimerManager().SetTimer(MeleeAttackCooldownTimer, this, &AAIDragon::ResetMeleeAttack, MeleeAttackCooldown, false);
 	}
 }
 
-void AAIDragon::RangedAttack()
+void AAIDragon::ResetMeleeAttack()
 {
-	if (!bIsAttacking)
+	bMeleeAttackReady = true;
+}
+
+void AAIDragon::ResetProjectileAttack()
+{
+	bProjectileAttackReady = true;
+}
+
+void AAIDragon::ProjectileAttack()
+{
+	if (bProjectileAttackReady)
 	{
-		bIsAttacking = true;
+		bProjectileAttackReady = false;
 
-		PlayAnimMontage(RangedAnim);
+		PlayAnimMontage(ProjectileAnim);
 
-		FHitResult Hit;
-		FVector StartLocation;
-		FRotator Forward;
+		FVector StartLocation = ProjectileSpawnPoint->GetComponentLocation();
+		FRotator ForwardRotation = ProjectileSpawnPoint->GetComponentRotation();
 
-		GetActorEyesViewPoint(StartLocation, Forward);
+		Fire(StartLocation, ForwardRotation, this, GetController());
 
-		Fire(StartLocation, Forward.Vector(), this, GetController());
+		GetWorld()->GetTimerManager().SetTimer(ProjectileAttackCooldownTimer, this, &AAIDragon::ResetProjectileAttack, ProjectileAttackCooldown, false);
 	}	
 }
 
-float AAIDragon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	float OutDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+void AAIDragon::OnHit(float HealthChange, AActor* InstigatingActor)
+{
 	if (HasAuthority())
 	{
-		if (!HealthComponent->IsDead())
+		if (!HealthComp->IsDead())
 		{
-			HealthComponent->DecreaseHealth(DamageAmount, DamageCauser);
-			HealthComponent->OnRep_CurrentHealth();
+			/*HealthComponent->DecreaseHealth(DamageAmount, DamageCauser);
+			HealthComponent->OnRep_CurrentHealth();*/
 
-			//PlayAnimMontage(GetRandomHitAnimation());
+			PlayAnimMontage(GetRandomHitAnimation());
 			BP_OnDamageTaken();
 		}
 	}
 	else
 	{
-		//PlayAnimMontage(GetRandomHitAnimation());
+		PlayAnimMontage(GetRandomHitAnimation());
 		BP_OnDamageTaken();
 	}
-
-	return OutDamage;
-}
-
-float AAIDragon::InternalTakePointDamage(float Damage, struct FPointDamageEvent const& PointDamageEvent, class AController* EventInstigator, AActor* DamageCauser)
-{
-	float OutDamage = Super::InternalTakePointDamage(Damage, PointDamageEvent, EventInstigator, DamageCauser);
-
-	if (HasAuthority())
-	{
-		if (!HealthComponent->IsDead())
-		{
-			HealthComponent->DecreaseHealth(OutDamage, DamageCauser);
-			HealthComponent->OnRep_CurrentHealth();
-
-			//PlayAnimMontage(GetRandomHitAnimation());
-			BP_OnDamageTaken();
-		}
-	}
-	else
-	{
-		//PlayAnimMontage(GetRandomHitAnimation());
-		BP_OnDamageTaken();
-	}
-
-	return OutDamage;
-}
-
-float AAIDragon::InternalTakeRadialDamage(float Damage, FRadialDamageEvent const& RadialDamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	float OutDamage = Super::InternalTakeRadialDamage(Damage, RadialDamageEvent, EventInstigator, DamageCauser);
-
-	if (HasAuthority())
-	{
-		if (!HealthComponent->IsDead())
-		{
-			HealthComponent->DecreaseHealth(OutDamage, DamageCauser);
-			HealthComponent->OnRep_CurrentHealth();
-
-			//PlayAnimMontage(GetRandomHitAnimation());
-			BP_OnDamageTaken();
-		}
-	}
-	else
-	{
-		//PlayAnimMontage(GetRandomHitAnimation());
-		BP_OnDamageTaken();
-	}
-	return OutDamage;
 }

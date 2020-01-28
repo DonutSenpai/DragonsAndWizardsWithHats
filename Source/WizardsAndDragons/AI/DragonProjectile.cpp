@@ -1,5 +1,6 @@
 #include "DragonProjectile.h"
 #include "Engine/World.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values
 ADragonProjectile::ADragonProjectile()
@@ -8,6 +9,8 @@ ADragonProjectile::ADragonProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	SetReplicates(true);
+
+	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 }
 
 // Called when the game starts or when spawned

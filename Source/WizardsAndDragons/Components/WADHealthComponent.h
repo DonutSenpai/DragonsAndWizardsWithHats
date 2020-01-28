@@ -78,8 +78,7 @@ protected:
 	// Invincible flag - Invincibles takes damage but doesnt lose health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		bool bInvincible = false;
-
-	// Add value to CurrentHealth
+	
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		void ToggleInvincibilityOff();
 

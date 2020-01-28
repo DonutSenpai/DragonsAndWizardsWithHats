@@ -58,8 +58,6 @@ void UWADHealthComponent::DecreaseHealth(float Value, AActor* InstigatingActor)
 		OnHealthChanged.Broadcast(Value, InstigatingActor);
 		OnRep_CurrentHealth();
 		GetWorld()->GetTimerManager().SetTimer(InvincibleTimer, this, &UWADHealthComponent::ToggleInvincibilityOff, 1.0f, false);
-
-		UE_LOG(LogTemp, Warning, TEXT("Health was decreased by: %f"), Value);
 	}
 }
 
