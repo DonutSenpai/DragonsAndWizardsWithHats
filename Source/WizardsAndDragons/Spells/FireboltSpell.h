@@ -32,7 +32,6 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void OnCastSpellEffectInternal(float TimeToTravel, FVector TargetLocation = FVector::ZeroVector, AActor* TargetActor = nullptr);
 
-
 private:
 
 	void DealDamage();
