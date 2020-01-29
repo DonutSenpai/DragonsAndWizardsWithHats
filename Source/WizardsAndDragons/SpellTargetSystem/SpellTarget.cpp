@@ -19,6 +19,25 @@ void ASpellTarget::SetRadius(float Radius)
 	SpellCollision->SetSphereRadius(Radius);	
 }
 
+void ASpellTarget::SetRange(float Range)
+{
+	TargetDecal->DecalSize = FVector(150.f, Range, Range);
+}
+
+void ASpellTarget::SetIsInRange(bool IsInRange)
+{
+	if (IsInRange)
+	{
+		if (TargetDecal->GetDecalMaterial() != InRangeDecalMaterial)
+		TargetDecal->SetDecalMaterial(InRangeDecalMaterial);
+	}
+	else
+	{
+		if (TargetDecal->GetDecalMaterial() != OutOfRangeDecalMaterial)
+		TargetDecal->SetDecalMaterial(OutOfRangeDecalMaterial);
+	}
+}
+
 void ASpellTarget::BeginPlay()
 {
 	Super::BeginPlay();

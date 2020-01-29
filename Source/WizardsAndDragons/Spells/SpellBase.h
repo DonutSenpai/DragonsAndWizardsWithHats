@@ -19,25 +19,25 @@ public:
 	FSlateBrush Icon;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
-	float Range = 50.f;
+	float Range = 500.f;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
-	float Radius = 5.f;
+	float Radius = 100.f;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
-	float Cooldown = 1.0f;
+	float Cooldown = 3.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
-	float Damage = 1.f;
+	float Damage = 5.f;
 
 	//Handles the cooldown automatically.
 	UFUNCTION(Server, Reliable)
 	void Server_CastSpell(FVector TargetLocation);
 
-	//Deals damage instantly in radius AOE when called. Separate event from cast spell because it might want to be timed to an effect etc
-	//Can be overridden to have single target damage instead of AOE
+	//Separate event from cast spell because it might want to be timed to an effect etc. Calls the InternalDealDamage function,
+	//which by default deals AOE damage. Can be overridden to have single target damage instead of AOE
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_DealDamage(FVector TargetLocation);
+	void Server_DealDamage(const TArray<AActor*> &SpellTargets);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool GetIsOnCooldown() { return CurrentCooldown > 0.0f; }
@@ -50,8 +50,9 @@ protected:
 	UFUNCTION()
 	virtual void InternalCastSpell(FVector TargetLocation);
 
+	//By default deals AOE damage. Can be overridden to have single target damage instead of AOE
 	UFUNCTION()
-	virtual void InternalDealDamage(FVector TargetLocation);
+	virtual void InternalDealDamage(const TArray<AActor*> &SpellTargets);
 
 
 	//Gets possible spell target actors in radius. This function ASSUMES that

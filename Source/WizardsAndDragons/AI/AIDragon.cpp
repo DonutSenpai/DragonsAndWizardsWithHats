@@ -7,22 +7,28 @@
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
 #include "../Components/WADHealthComponent.h"
+#include "DragonProjectile.h"
 
 AAIDragon::AAIDragon()
 {
-	HealthComponent = CreateDefaultSubobject<UWADHealthComponent>(TEXT("HealthComponent"));
-	HealthComponent->SetIsReplicated(true);
-
 	SetReplicates(true);
+
+	HealthComp = CreateDefaultSubobject<UWADHealthComponent>(TEXT("HealthComp"));
+	HealthComp->SetIsReplicated(true);
+
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
+	ProjectileSpawnPoint->SetupAttachment(RootComponent);
+	ProjectileSpawnPoint->SetRelativeLocation(FVector(120.0f, 0.0f, -40.0f));
 }
 
 void AAIDragon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (HealthComponent)
+	if (HealthComp)
 	{
-		HealthComponent->OnDeath.AddDynamic(this, &AAIDragon::OnDie);
+		HealthComp->OnDeath.AddDynamic(this, &AAIDragon::OnDie);
+		HealthComp->OnHealthChanged.AddDynamic(this, &AAIDragon::OnHit);
 	}
 }
 
@@ -34,6 +40,26 @@ bool AAIDragon::ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, 
 void AAIDragon::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
 {
 	Super::GetActorEyesViewPoint(OutLocation, OutRotation);
+}
+
+void AAIDragon::Fire(const FVector& StartLocation, const FRotator& ForwardRotation, AActor* DamageCauser, AController* EventInstigator)
+{
+	if (ProjectileClass.Get() == nullptr)
+	{
+		return;
+	}
+
+	if (HasAuthority())
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		const FVector SpawnLocation = StartLocation;
+
+		const FRotator SpawnRotation = ForwardRotation;
+		ADragonProjectile* NewProjectile = GetWorld()->SpawnActor<ADragonProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+	}
 }
 
 void AAIDragon::OnDie()
@@ -50,7 +76,7 @@ void AAIDragon::OnDie()
 		}
 	}
 
-	//PlayAnimMontage(GetRandomDeathAnimation());
+	PlayAnimMontage(DeathAnim);
 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAIDragon::DoRagdoll, FMath::RandRange(0.25f, 0.5f), false);
@@ -66,9 +92,9 @@ class UAnimMontage* AAIDragon::GetRandomHitAnimation() const
 	return HitReactions[FMath::RandRange(0, HitReactions.Num() - 1)];
 }
 
-class UAnimMontage* AAIDragon::GetRandomDeathAnimation() const
+class UAnimMontage* AAIDragon::GetRandomMeleeAnimation() const
 {
-	return DeathAnims[FMath::RandRange(0, DeathAnims.Num() - 1)];
+	return MeleeAnims[FMath::RandRange(0, MeleeAnims.Num() - 1)];
 }
 
 void AAIDragon::DoRagdoll()
@@ -79,73 +105,62 @@ void AAIDragon::DoRagdoll()
 	SetLifeSpan(10.0f);
 }
 
-float AAIDragon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void AAIDragon::MeleeAttack()
 {
-	float OutDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	if (HasAuthority())
+	if (bMeleeAttackReady)
 	{
-		if (!HealthComponent->IsDead())
-		{
-			HealthComponent->DecreaseHealth(DamageAmount, DamageCauser);
-			HealthComponent->OnRep_CurrentHealth();
+		bMeleeAttackReady = false;
 
-			//PlayAnimMontage(GetRandomHitAnimation());
-			BP_OnDamageTaken();
-		}
-	}
-	else
-	{
-		//PlayAnimMontage(GetRandomHitAnimation());
-		BP_OnDamageTaken();
-	}
+		PlayAnimMontage(GetRandomMeleeAnimation());
 
-	return OutDamage;
+		GetWorld()->GetTimerManager().SetTimer(MeleeAttackCooldownTimer, this, &AAIDragon::ResetMeleeAttack, MeleeAttackCooldown, false);
+	}
 }
 
-float AAIDragon::InternalTakePointDamage(float Damage, struct FPointDamageEvent const& PointDamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+void AAIDragon::ResetMeleeAttack()
 {
-	float OutDamage = Super::InternalTakePointDamage(Damage, PointDamageEvent, EventInstigator, DamageCauser);
-
-	if (HasAuthority())
-	{
-		if (!HealthComponent->IsDead())
-		{
-			HealthComponent->DecreaseHealth(OutDamage, DamageCauser);
-			HealthComponent->OnRep_CurrentHealth();
-
-			//PlayAnimMontage(GetRandomHitAnimation());
-			BP_OnDamageTaken();
-		}
-	}
-	else
-	{
-		//PlayAnimMontage(GetRandomHitAnimation());
-		BP_OnDamageTaken();
-	}
-
-	return OutDamage;
+	bMeleeAttackReady = true;
 }
 
-float AAIDragon::InternalTakeRadialDamage(float Damage, FRadialDamageEvent const& RadialDamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void AAIDragon::ResetProjectileAttack()
 {
-	float OutDamage = Super::InternalTakeRadialDamage(Damage, RadialDamageEvent, EventInstigator, DamageCauser);
+	bProjectileAttackReady = true;
+}
 
+void AAIDragon::ProjectileAttack()
+{
+	if (bProjectileAttackReady)
+	{
+		bProjectileAttackReady = false;
+
+		PlayAnimMontage(ProjectileAnim);
+
+		FVector StartLocation = ProjectileSpawnPoint->GetComponentLocation();
+		FRotator ForwardRotation = ProjectileSpawnPoint->GetComponentRotation();
+
+		Fire(StartLocation, ForwardRotation, this, GetController());
+
+		GetWorld()->GetTimerManager().SetTimer(ProjectileAttackCooldownTimer, this, &AAIDragon::ResetProjectileAttack, ProjectileAttackCooldown, false);
+	}	
+}
+
+
+void AAIDragon::OnHit(float HealthChange, AActor* InstigatingActor)
+{
 	if (HasAuthority())
 	{
-		if (!HealthComponent->IsDead())
+		if (!HealthComp->IsDead())
 		{
-			HealthComponent->DecreaseHealth(OutDamage, DamageCauser);
-			HealthComponent->OnRep_CurrentHealth();
+			/*HealthComponent->DecreaseHealth(DamageAmount, DamageCauser);
+			HealthComponent->OnRep_CurrentHealth();*/
 
-			//PlayAnimMontage(GetRandomHitAnimation());
+			PlayAnimMontage(GetRandomHitAnimation());
 			BP_OnDamageTaken();
 		}
 	}
 	else
 	{
-		//PlayAnimMontage(GetRandomHitAnimation());
+		PlayAnimMontage(GetRandomHitAnimation());
 		BP_OnDamageTaken();
 	}
-	return OutDamage;
 }

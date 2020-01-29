@@ -7,7 +7,7 @@
 USpellTargetSystemComponent::USpellTargetSystemComponent()
 {
 }
- 
+
 
 void USpellTargetSystemComponent::StartSpellTargetSystem(USpellBase* Spell)
 {
@@ -21,10 +21,18 @@ void USpellTargetSystemComponent::StartSpellTargetSystem(USpellBase* Spell)
 		UE_LOG(LogTemp, Error, TEXT("You can't start the spell target system without a valid spell class as a parameter."));
 	}
 
+	if (SpellTarget)
+	{
+		StopSpellTargetSystem();
+	}
+
 	SelectedSpell = Spell;
 
 	SpellTarget = Cast<ASpellTarget>(GetWorld()->SpawnActor(SpellTargetClass));
 	SpellTarget->SetRadius(SelectedSpell->Radius);
+
+	SpellTargetRangeIndicator = Cast<ASpellTarget>(GetWorld()->SpawnActor(SpellTargetRangeIndicatorClass));
+	SpellTargetRangeIndicator->SetRange(SelectedSpell->Range);
 
 	if (SpellTarget)
 	{
@@ -33,6 +41,7 @@ void USpellTargetSystemComponent::StartSpellTargetSystem(USpellBase* Spell)
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Spell Target didnt spawn correctly"));
+		return;
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(SpellTargetHandle, this, &USpellTargetSystemComponent::SimulateSpellTarget, 0.03f, true, 0.0f);
@@ -42,17 +51,51 @@ void USpellTargetSystemComponent::StartSpellTargetSystem(USpellBase* Spell)
 void USpellTargetSystemComponent::StopSpellTargetSystem()
 {
 	GetWorld()->GetTimerManager().ClearTimer(SpellTargetHandle);
-	SpellTarget->Destroy();
+
+	if (SpellTarget)
+	{
+		SpellTarget->Destroy();
+	}
+
+	if (SpellTargetRangeIndicator)
+	{
+		SpellTargetRangeIndicator->Destroy();
+	}
+
 	bIsSystemActive = false;
+	SelectedSpell = nullptr;
 }
 
 void USpellTargetSystemComponent::CastSpell()
 {
-	if (SpellTarget == nullptr || SelectedSpell->GetIsOnCooldown()) return;
+	if (SpellTarget == nullptr || SelectedSpell->GetIsOnCooldown() || !CanCastSpell()) return;
 
 	SelectedSpell->Server_CastSpell(SpellTarget->GetActorLocation());
 	StopSpellTargetSystem();
 
+}
+
+bool USpellTargetSystemComponent::GetIsSystemAlreadyActive(USpellBase* IsSpellActive)
+{
+	if (SelectedSpell)
+	{
+
+		return SelectedSpell->Name == IsSpellActive->Name;
+	}
+
+	return false;
+
+}
+
+bool USpellTargetSystemComponent::CanActivateSystem(USpellBase* SpellToActivate)
+{
+	if (SpellToActivate->GetIsOnCooldown())
+		return false;
+
+	if (SelectedSpell && SelectedSpell->Name == SpellToActivate->Name)
+		return false;
+
+	return true;
 }
 
 void USpellTargetSystemComponent::SimulateSpellTarget()
@@ -66,10 +109,33 @@ void USpellTargetSystemComponent::SimulateSpellTarget()
 
 	SpellTarget->SetActorLocation(OutHitMousePosition.ImpactPoint);
 
-//	FVector Location = SpellTarget->GetActorLocation();
-	
+	if (CanCastSpell())
+	{
+		SpellTarget->SetIsInRange(true);
+		SpellTargetRangeIndicator->SetIsInRange(true);
+	}
+	else
+	{
+		SpellTarget->SetIsInRange(false);
+		SpellTargetRangeIndicator->SetIsInRange(false);
+	}
 
-	//UE_LOG(LogTemp, Warning, TEXT("Spell Target position: X: %f Y: %f Z: %f"), Location.X, Location.Y, StartLocation.Z);
+	FVector RangeIndicatorLocation = OwningController->GetPawn()->GetActorLocation();	
+	RangeIndicatorLocation.Z -= 175.f;
+	SpellTargetRangeIndicator->SetActorLocation(RangeIndicatorLocation);
 
+}
 
+bool USpellTargetSystemComponent::CanCastSpell()
+{
+	float DistanceToSpellTarget = FVector::Distance(OwningController->GetPawn()->GetActorLocation(), SpellTarget->GetActorLocation());
+
+	if (DistanceToSpellTarget >= SelectedSpell->Range)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }

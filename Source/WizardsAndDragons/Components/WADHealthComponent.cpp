@@ -7,6 +7,7 @@
 UWADHealthComponent::UWADHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	bEditableWhenInherited = true;
 }
 
 // Called when the game starts
@@ -17,7 +18,7 @@ void UWADHealthComponent::BeginPlay()
 	CurrentHealth = MaxHealth;
 
 	// Get the owner of the component
-	AActor* Owner = GetOwner();
+	Owner = GetOwner();
 }
 
 bool UWADHealthComponent::GetInvincible() const
@@ -25,12 +26,12 @@ bool UWADHealthComponent::GetInvincible() const
 	return bInvincible;
 }
 
-int UWADHealthComponent::GetCurrentHealth() const
+float UWADHealthComponent::GetCurrentHealth() const
 {
 	return CurrentHealth;
 }
 
-int UWADHealthComponent::GetMaxHealth() const
+float UWADHealthComponent::GetMaxHealth() const
 {
 	return MaxHealth;
 }
@@ -49,7 +50,7 @@ void UWADHealthComponent::ModifyHealth(float Value)
 
 void UWADHealthComponent::DecreaseHealth(float Value, AActor* InstigatingActor)
 {
-	if (!bInvincible)
+	if (!bInvincible && InstigatingActor != Owner)
 	{
 		bInvincible = true;
 		CurrentHealth -= Value;
@@ -57,8 +58,6 @@ void UWADHealthComponent::DecreaseHealth(float Value, AActor* InstigatingActor)
 		OnHealthChanged.Broadcast(Value, InstigatingActor);
 		OnRep_CurrentHealth();
 		GetWorld()->GetTimerManager().SetTimer(InvincibleTimer, this, &UWADHealthComponent::ToggleInvincibilityOff, 1.0f, false);
-
-		UE_LOG(LogTemp, Warning, TEXT("Health was decreased by: %f"), Value);
 	}
 }
 

@@ -3,6 +3,11 @@
 #include "GameFramework/Character.h"
 #include "AIDragon.generated.h"
 
+class ADragonProjectile;
+class UWADHealthComponent;
+class UAnimMontage;
+class AAIController;
+
 UCLASS()
 class AAIDragon : public ACharacter
 {
@@ -16,10 +21,18 @@ public:
 
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
 
+	void Fire(const FVector& StartLocation, const FRotator& ForwardRotation, AActor* DamageCauser, AController* EventInstigator);
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<ADragonProjectile> ProjectileClass;
+
 	UFUNCTION()
 		void OnDie();
 
-	class AAIController* GetAIController() const;
+	UFUNCTION()
+		void OnHit(float HealthChange, AActor* InstigatingActor);
+
+	 AAIController* GetAIController() const;
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Damage Taken"))
 		void BP_OnDamageTaken();
@@ -28,30 +41,61 @@ public:
 		void BP_OnDead();
 
 	UFUNCTION(BlueprintCallable)
-		class UAnimMontage* GetRandomHitAnimation() const;
+		 UAnimMontage* GetRandomHitAnimation() const;
 
 	UFUNCTION(BlueprintCallable)
-		class UAnimMontage* GetRandomDeathAnimation() const;
+		 UAnimMontage* GetRandomMeleeAnimation() const;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		 UWADHealthComponent* HealthComp;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Health)
-		class UWADHealthComponent* HealthComponent;
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+		TArray<UAnimMontage*> HitReactions;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
-		TArray<class UAnimMontage*> HitReactions;
+		UAnimMontage* DeathAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
-		TArray<class UAnimMontage*> DeathAnims;
+		TArray<UAnimMontage*> MeleeAnims;
+
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+			 UAnimMontage*  ProjectileAnim;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
+		USceneComponent* ProjectileSpawnPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AttackBehaviour)
+		bool bMeleeAttackReady = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AttackBehaviour)
+		bool bProjectileAttackReady = true;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AttackBehaviour)
+		float ProjectileAttackCooldown = 3.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AttackBehaviour)
+		float MeleeAttackCooldown = 1.5f;
 
 	bool bDead = false;
 
 	UFUNCTION()
 		void DoRagdoll();
 
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	UFUNCTION(BlueprintCallable)
+		void MeleeAttack();
 
-	virtual float InternalTakePointDamage(float Damage, struct FPointDamageEvent const& PointDamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	UFUNCTION(BlueprintCallable)
+		void ProjectileAttack();
 
-	virtual float InternalTakeRadialDamage(float Damage, FRadialDamageEvent const& RadialDamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	UFUNCTION(BlueprintCallable, Category = "Animation")
+		void ResetMeleeAttack();
+
+	UFUNCTION(BlueprintCallable, Category = "Animation")
+		void ResetProjectileAttack();
+	
+	FTimerHandle MeleeAttackCooldownTimer;
+
+	FTimerHandle ProjectileAttackCooldownTimer;
 };
 

@@ -22,11 +22,11 @@ public:
 
 	// Get the current health of the character
 	UFUNCTION(BlueprintPure, Category = "Health")
-		int GetCurrentHealth() const;
+		float GetCurrentHealth() const;
 
 	// Get the max health of the character
 	UFUNCTION(BlueprintPure, Category = "Health")
-		int GetMaxHealth() const;
+		float GetMaxHealth() const;
 
 	// Change Actor MaxHealth
 	UFUNCTION(BlueprintCallable, Category = "Health")
@@ -59,7 +59,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 		FDeathEvent OnDeath;
 
-	// Fires when health reaches zero
+	// Fires when health has been changed
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 		FHealthChangedEvent OnHealthChanged;
 
@@ -68,7 +68,7 @@ public:
 
 protected:
 	// The current value of heatlh
-	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, VisibleAnywhere, Category = "Health")
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, VisibleAnywhere)
 		float  CurrentHealth;
 
 	// The max health of the component
@@ -78,10 +78,11 @@ protected:
 	// Invincible flag - Invincibles takes damage but doesnt lose health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		bool bInvincible = false;
-
-	// Add value to CurrentHealth
+	
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		void ToggleInvincibilityOff();
+
+	AActor* Owner;
 
 private:
 	FTimerHandle InvincibleTimer;
