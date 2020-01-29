@@ -19,16 +19,16 @@ public:
 	FSlateBrush Icon;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
-	float Range = 50.f;
+	float Range = 500.f;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
-	float Radius = 5.f;
+	float Radius = 100.f;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
-	float Cooldown = 1.0f;
+	float Cooldown = 3.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
-	float Damage = 1.f;
+	float Damage = 5.f;
 
 	//Handles the cooldown automatically.
 	UFUNCTION(Server, Reliable)
