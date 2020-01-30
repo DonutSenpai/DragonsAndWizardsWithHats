@@ -4,6 +4,7 @@
 #include "Components/CapsuleComponent.h"
 #include "NavigationSystem.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "../Player/WizardsAndDragonsCharacter.h"
 
 AWADAIController::AWADAIController(const FObjectInitializer& ObjectInitializer)
 {
@@ -49,7 +50,8 @@ void AWADAIController::OnActorPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 {
 	if (!HasTarget(Actor))
 	{
-		AddNewTarget(Actor, Stimulus.WasSuccessfullySensed());
+		//if (Actor->GetClass()->IsChildOf<AWizardsAndDragonsCharacter>())
+			AddNewTarget(Actor, Stimulus.WasSuccessfullySensed());	
 	}
 	else
 	{
@@ -61,16 +63,16 @@ ETeamAttitude::Type AWADAIController::GetTeamAttitudeTowards(const AActor& Other
 {
 	ETeamAttitude::Type Attitude = ETeamAttitude::Hostile;
 
-	//const AAICharacter* MyCharacter = GetAICharacter();
-	//const AFPSCharacter* OtherCharacter = Cast<const AFPSCharacter>(&Other);
+	const AAIDragon* MyCharacter = GetAIDragon();
+	const AAIDragon* OtherCharacter = Cast<AAIDragon>(&Other);
 
-	//if (MyCharacter && OtherCharacter)
-	//{
-	//	if (MyCharacter->Team == OtherCharacter->Team)
-	//	{
-	//		Attitude = ETeamAttitude::Friendly;
-	//	}
-	//}
+	if (MyCharacter && OtherCharacter)
+	{
+		if (MyCharacter->Team == OtherCharacter->Team)
+		{
+			Attitude = ETeamAttitude::Friendly;
+		}
+	}
 
 	return Attitude;
 }

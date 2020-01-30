@@ -21,10 +21,17 @@ public:
 
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
 
+	UFUNCTION(BlueprintPure)
+		int32 GetTeam() const { return Team; }
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Team)
+		int32 Team = 0;
+
 	void Fire(const FVector& StartLocation, const FRotator& ForwardRotation, AActor* DamageCauser, AController* EventInstigator);
 
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<ADragonProjectile> ProjectileClass;
+
 
 	UFUNCTION()
 		void OnDie();
