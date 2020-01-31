@@ -27,9 +27,10 @@ void ADragonProjectile::BeginPlay()
 
 void ADragonProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	Explode();
+
 	if (HasAuthority())
-	{
-			Explode();
+	{		
 			if (OtherActor->GetClass()->IsChildOf<AWizardsAndDragonsCharacter>())
 			{
 				UWADHealthComponent* PlayerHealthComp = OtherActor->FindComponentByClass<UWADHealthComponent>();
@@ -39,7 +40,7 @@ void ADragonProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAct
 					PlayerHealthComp->DecreaseHealth(DamageAmmount, this);
 				}
 			}
-			Destroy();
+			
 	}
 }
 
@@ -54,5 +55,6 @@ void ADragonProjectile::Explode()
 {
 	SetActorTickEnabled(false);
 	BP_OnExplode();
+	Destroy();
 }
 
