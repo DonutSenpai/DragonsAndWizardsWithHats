@@ -27,6 +27,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartSpellTargetSystem(class USpellBase* Spell);
 
+	void OnSpellCast();
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
