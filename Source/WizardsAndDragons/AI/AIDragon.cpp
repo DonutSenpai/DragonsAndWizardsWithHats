@@ -117,9 +117,23 @@ void AAIDragon::MeleeAttack()
 	}
 }
 
+void AAIDragon::BiteAttack()
+{
+	if (bMeleeAttackReady)
+	{
+		bMeleeAttackReady = false;
+
+		PlayAnimMontage(BiteAnim);
+
+		GetWorld()->GetTimerManager().SetTimer(MeleeAttackCooldownTimer, this, &AAIDragon::ResetMeleeAttack, MeleeAttackCooldown, false);
+	}
+}
+
 void AAIDragon::ResetMeleeAttack()
 {
 	bMeleeAttackReady = true;
+
+	BP_OnResetMelee();
 }
 
 void AAIDragon::ResetProjectileAttack()

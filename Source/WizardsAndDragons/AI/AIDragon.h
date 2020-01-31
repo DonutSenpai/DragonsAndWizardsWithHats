@@ -32,7 +32,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<ADragonProjectile> ProjectileClass;
 
-
 	UFUNCTION()
 		void OnDie();
 
@@ -46,6 +45,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Dead"))
 		void BP_OnDead();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Reset Melee Attack"))
+		void BP_OnResetMelee();
 
 	UFUNCTION(BlueprintCallable)
 		 UAnimMontage* GetRandomHitAnimation() const;
@@ -65,6 +67,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 		TArray<UAnimMontage*> MeleeAnims;
+
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+		UAnimMontage* BiteAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 			 UAnimMontage*  ProjectileAnim;
@@ -91,6 +96,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 		void MeleeAttack();
+
+	UFUNCTION(BlueprintCallable)
+		void BiteAttack();
 
 	UFUNCTION(BlueprintCallable)
 		void ProjectileAttack();
