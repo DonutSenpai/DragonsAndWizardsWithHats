@@ -15,6 +15,11 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
 	float TravelTime = 1.0f;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
+	float ExplosionLaunchPower = 100.f;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SpellProperties)
+	float ExplosionLaunchHeightAdd = -10.f;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnCastSpellEffect(float TimeToTravel, FVector TargetLocation = FVector::ZeroVector);
@@ -34,6 +39,7 @@ private:
 	void HitExplosion(FVector TargetLocation);
 
 	FVector SpellTargetLocation = FVector::ZeroVector;
+
 
 
 };
