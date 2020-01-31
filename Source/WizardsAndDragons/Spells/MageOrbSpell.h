@@ -21,6 +21,9 @@ protected:
 
 	virtual void InternalCastSpell(FVector TargetLocation) override;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void OnCastSpellEffectInternal(float TimeToTravel, FVector TargetLocation = FVector::ZeroVector);
+
 private:
 
 	FTimerHandle HitExplosionHandle;
