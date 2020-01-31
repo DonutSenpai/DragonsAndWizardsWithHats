@@ -8,6 +8,7 @@
 #include "AITypes.h"
 #include "WADAIController.generated.h"
 
+class AWizardsAndDragonsCharacter;
 
 USTRUCT(BlueprintType)
 struct FAITargetInfo
