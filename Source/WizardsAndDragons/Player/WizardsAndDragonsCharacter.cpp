@@ -65,6 +65,11 @@ void AWizardsAndDragonsCharacter::BeginPlay()
 
 }
 
+void AWizardsAndDragonsCharacter::InternalOnSpellCast_Implementation()
+{
+	OnSpellCast();
+}
+
 void AWizardsAndDragonsCharacter::Multicast_SetHat_Implementation(int HatNumber)
 {
 	SetHat(HatNumber);

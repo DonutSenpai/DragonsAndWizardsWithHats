@@ -53,6 +53,11 @@ void AWADPlayerController::StartSpellTargetSystem(class USpellBase* Spell)
 	SpellTargetSystem->StartSpellTargetSystem(Spell);
 }
 
+void AWADPlayerController::OnSpellCast()
+{
+	OwnedCharacter->InternalOnSpellCast();
+}
+
 void AWADPlayerController::PrintLeftClick()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, TEXT("Left Clicked"));

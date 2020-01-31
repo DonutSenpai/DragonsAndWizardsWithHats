@@ -41,6 +41,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UWADHealthComponent* HealthComponent;
 
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	bool IsCastingSpell = false;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSpellCast();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void InternalOnSpellCast();
+
 protected:
 	void Turn(float Rate);
 	void LookUp(float Rate);
