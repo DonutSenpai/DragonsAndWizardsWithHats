@@ -22,8 +22,14 @@ public:
 
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = AttackBehaviour)
 		int32 GetTeam() const { return Team; }
+
+	UFUNCTION(BlueprintPure, Category = AttackBehaviour)
+		bool GetProjectileAttackReady() const { return bProjectileAttackReady && bRangedAttackReady; }
+
+	UFUNCTION(BlueprintPure, Category = AttackBehaviour)
+		bool GetFireStormAttackReady() const { return bFireStormAttackReady && bRangedAttackReady; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Team)
 		int32 Team = 0;

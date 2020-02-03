@@ -154,9 +154,10 @@ void AAIDragon::ResetFireStormAttack()
 
 void AAIDragon::ProjectileAttack()
 {
-	if (bProjectileAttackReady)
+	if (bProjectileAttackReady && bRangedAttackReady)
 	{
 		bProjectileAttackReady = false;
+		bRangedAttackReady = false;
 
 		PlayAnimMontage(ProjectileAnim);
 
@@ -166,15 +167,17 @@ void AAIDragon::ProjectileAttack()
 		Fire(StartLocation, ForwardRotation, this, GetController());
 
 		GetWorld()->GetTimerManager().SetTimer(ProjectileAttackCooldownTimer, this, &AAIDragon::ResetProjectileAttack, ProjectileAttackCooldown, false);
+		GetWorld()->GetTimerManager().SetTimer(RangedAttackCooldownTimer, this, &AAIDragon::ResetRangedAttack, RangedAttackCooldown, false);
 	}	
 }
 
 
 void AAIDragon::FireStormAttack(FVector SpawnLocation)
 {
-	if (bFireStormAttackReady)
+	if (bFireStormAttackReady && bRangedAttackReady)
 	{
 		bFireStormAttackReady = false;
+		bRangedAttackReady = false;
 
 		PlayAnimMontage(ProjectileAnim);
 
@@ -183,6 +186,7 @@ void AAIDragon::FireStormAttack(FVector SpawnLocation)
 		SpawnFireStorm(SpawnLocation, SpawnRotation, this, GetController());
 
 		GetWorld()->GetTimerManager().SetTimer(FireStormAttackCooldownTimer, this, &AAIDragon::ResetFireStormAttack, FireStormAttackCooldown, false);
+		GetWorld()->GetTimerManager().SetTimer(RangedAttackCooldownTimer, this, &AAIDragon::ResetRangedAttack, RangedAttackCooldown, false);
 	}
 }
 

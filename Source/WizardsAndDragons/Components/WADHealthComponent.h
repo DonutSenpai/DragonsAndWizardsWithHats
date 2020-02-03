@@ -7,6 +7,16 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeathEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChangedEvent, float, ChangeValue, AActor*, InstigatingActor);
 
+
+UENUM(BlueprintType)		//"BlueprintType" is essential to include
+enum class EHealthStateEnum : uint8
+{
+	HE_FullHealth 	UMETA(DisplayName = "FullHealth"),
+	HE_ThreeQuarterHealth	UMETA(DisplayName = "ThreeQuarterHealth"),
+	HE_HalfHealth 	UMETA(DisplayName = "HalfHealth"),
+	HE_QuarterHealth	UMETA(DisplayName = "QuarterHealth")
+};
+
 UCLASS(Blueprintable)
 class  UWADHealthComponent : public UActorComponent
 {
@@ -15,6 +25,9 @@ class  UWADHealthComponent : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	UWADHealthComponent();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
+		EHealthStateEnum HealthStateEnum;
 
 	// Get invincible status of the character
 	UFUNCTION(BlueprintPure, Category = "Health")
@@ -51,6 +64,10 @@ public:
 	// Blueprint event to run on increased health
 	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
 		void OnIncreaseHealth(float Value, AActor* InstigatingActor);
+
+	// Blueprint event to run on increased health
+	UFUNCTION()
+		void HealthChanged();
 
 	UFUNCTION(BlueprintPure)
 		bool IsDead() const;

@@ -2,6 +2,7 @@
 #include "GameFramework/Actor.h"
 #include "TimerManager.h"
 #include "Net/UnrealNetwork.h"
+#include "Math/UnrealMathUtility.h"
 
 // Sets default values for this component's properties
 UWADHealthComponent::UWADHealthComponent()
@@ -79,6 +80,23 @@ void UWADHealthComponent::ToggleInvincibilityOff()
 
 void UWADHealthComponent::OnRep_CurrentHealth()
 {
+	if (FMath::IsWithin(CurrentHealth, MaxHealth * 3 / 4, MaxHealth))
+	{
+		HealthStateEnum = EHealthStateEnum::HE_FullHealth;
+	}
+	else if (FMath::IsWithin(CurrentHealth, MaxHealth / 2, MaxHealth * 3 / 4))
+	{
+		HealthStateEnum = EHealthStateEnum::HE_ThreeQuarterHealth;
+	}
+	else if (FMath::IsWithin(CurrentHealth, MaxHealth * 1 / 4, MaxHealth / 2))
+	{
+		HealthStateEnum = EHealthStateEnum::HE_HalfHealth;
+	}
+	else if (FMath::IsWithin(CurrentHealth, 0.0f, MaxHealth * 1 / 4))
+	{
+		HealthStateEnum = EHealthStateEnum::HE_QuarterHealth;
+	}
+
 	if (IsDead())
 	{
 		OnDeath.Broadcast();
