@@ -22,15 +22,22 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = Damage)
-		float DamageAmmount = 10;
+		float DamageAmmount = 5;
 
 	UPROPERTY(EditDefaultsOnly, Category = Damage)
-		float DamageInterval = 1;
+		float DamageInterval = 0.5;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Duration)
 		float Duration = 5;
 
-	UPROPERTY(EditDefaultsOnly, Category = Movement)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Duration)
+		float InitialDelay = 2;
+
+	bool bFireStormActive = false;
+
+	FTimerHandle FireStormActivationTimer;
+
+	UPROPERTY(EditDefaultsOnly, Category = Collider)
 		UCapsuleComponent* CapsuleComp;
 
 	UFUNCTION()
@@ -42,6 +49,7 @@ protected:
 	UFUNCTION()
 		void DealDamage();
 
+	void ActivateFireStorm();
 	TArray<AActor*> AffectedActors;
 
 	FTimerHandle DealDamageTimerHandle;

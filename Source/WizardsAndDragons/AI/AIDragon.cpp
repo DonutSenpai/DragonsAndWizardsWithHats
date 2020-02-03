@@ -8,6 +8,7 @@
 #include "Engine/Engine.h"
 #include "../Components/WADHealthComponent.h"
 #include "DragonProjectile.h"
+#include "FireStorm.h"
 
 AAIDragon::AAIDragon()
 {
@@ -136,9 +137,19 @@ void AAIDragon::ResetMeleeAttack()
 	BP_OnResetMelee();
 }
 
+void AAIDragon::ResetRangedAttack()
+{
+	bRangedAttackReady = true;
+}
+
 void AAIDragon::ResetProjectileAttack()
 {
 	bProjectileAttackReady = true;
+}
+
+void AAIDragon::ResetFireStormAttack()
+{
+	bFireStormAttackReady = true;
 }
 
 void AAIDragon::ProjectileAttack()
@@ -158,6 +169,39 @@ void AAIDragon::ProjectileAttack()
 	}	
 }
 
+
+void AAIDragon::FireStormAttack(FVector SpawnLocation)
+{
+	if (bFireStormAttackReady)
+	{
+		bFireStormAttackReady = false;
+
+		PlayAnimMontage(ProjectileAnim);
+
+		FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
+
+		SpawnFireStorm(SpawnLocation, SpawnRotation, this, GetController());
+
+		GetWorld()->GetTimerManager().SetTimer(FireStormAttackCooldownTimer, this, &AAIDragon::ResetFireStormAttack, FireStormAttackCooldown, false);
+	}
+}
+
+void AAIDragon::SpawnFireStorm(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* DamageCauser, AController* EventInstigator)
+{
+	if (FireStormClass.Get() == nullptr)
+	{
+		return;
+	}
+
+	if (HasAuthority())
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		AFireStorm* NewFireStorm = GetWorld()->SpawnActor<AFireStorm>(FireStormClass, SpawnLocation, SpawnRotation, SpawnParams);
+	}
+}
 
 void AAIDragon::OnHit(float HealthChange, AActor* InstigatingActor)
 {

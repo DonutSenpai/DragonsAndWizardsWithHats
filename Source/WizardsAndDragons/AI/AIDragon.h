@@ -4,6 +4,7 @@
 #include "AIDragon.generated.h"
 
 class ADragonProjectile;
+class AFireStorm;
 class UWADHealthComponent;
 class UAnimMontage;
 class AAIController;
@@ -29,8 +30,11 @@ public:
 
 	void Fire(const FVector& StartLocation, const FRotator& ForwardRotation, AActor* DamageCauser, AController* EventInstigator);
 
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	UPROPERTY(EditDefaultsOnly, Category = AttackBehaviour)
 		TSubclassOf<ADragonProjectile> ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = AttackBehaviour)
+		TSubclassOf<AFireStorm> FireStormClass;
 
 	UFUNCTION()
 		void OnDie();
@@ -80,14 +84,26 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AttackBehaviour)
 		bool bMeleeAttackReady = true;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AttackBehaviour)
+		float MeleeAttackCooldown = 1.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AttackBehaviour)
+		bool bRangedAttackReady = true;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AttackBehaviour)
+		float RangedAttackCooldown = 1.5f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AttackBehaviour)
 		bool bProjectileAttackReady = true;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AttackBehaviour)
 		float ProjectileAttackCooldown = 3.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AttackBehaviour)
+		bool bFireStormAttackReady = true;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AttackBehaviour)
-		float MeleeAttackCooldown = 1.5f;
+		float FireStormAttackCooldown = 5.0f;
 
 	bool bDead = false;
 
@@ -103,14 +119,29 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void ProjectileAttack();
 
-	UFUNCTION(BlueprintCallable, Category = "Animation")
+	UFUNCTION(BlueprintCallable)
+		void FireStormAttack(FVector SpawnLocation);
+
+	void SpawnFireStorm(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* DamageCauser, AController* EventInstigator);
+
+	UFUNCTION(BlueprintCallable, Category = AttackBehaviour)
 		void ResetMeleeAttack();
 
-	UFUNCTION(BlueprintCallable, Category = "Animation")
+	UFUNCTION(BlueprintCallable, Category = AttackBehaviour)
+		void ResetRangedAttack();
+
+	UFUNCTION(BlueprintCallable, Category = AttackBehaviour)
 		void ResetProjectileAttack();
+
+	UFUNCTION(BlueprintCallable, Category = AttackBehaviour)
+		void ResetFireStormAttack();
 	
 	FTimerHandle MeleeAttackCooldownTimer;
 
+	FTimerHandle RangedAttackCooldownTimer;
+
 	FTimerHandle ProjectileAttackCooldownTimer;
+
+	FTimerHandle FireStormAttackCooldownTimer;
 };
 
