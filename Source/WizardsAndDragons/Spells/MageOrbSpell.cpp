@@ -7,6 +7,11 @@ void UMageOrbSpell::InternalCastSpell(FVector TargetLocation)
 
 }
 
+void UMageOrbSpell::InternalDealDamage(const TArray<AActor*>& SpellTargets)
+{
+	//Deal no damage here, doing it in the spawned MageOrb
+}
+
 void UMageOrbSpell::OnCastSpellEffectInternal_Implementation(float TimeToTravel, FVector TargetLocation /*= FVector::ZeroVector*/)
 {
 	OnCastSpellEffect(TravelTime, TargetLocation);

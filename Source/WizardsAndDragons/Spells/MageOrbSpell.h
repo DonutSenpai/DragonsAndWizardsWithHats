@@ -21,6 +21,8 @@ protected:
 
 	virtual void InternalCastSpell(FVector TargetLocation) override;
 
+	virtual void InternalDealDamage(const TArray<AActor*>& SpellTargets) override;
+
 	UFUNCTION(NetMulticast, Reliable)
 	void OnCastSpellEffectInternal(float TimeToTravel, FVector TargetLocation = FVector::ZeroVector);
 
