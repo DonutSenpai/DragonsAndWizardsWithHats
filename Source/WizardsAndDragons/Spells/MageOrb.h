@@ -16,7 +16,7 @@ public:
 
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnMageOrbOverlapEffect();
+	void OnMageOrbOverlapEffect(AActor* OverlappedActor);
 
 
 	UFUNCTION()

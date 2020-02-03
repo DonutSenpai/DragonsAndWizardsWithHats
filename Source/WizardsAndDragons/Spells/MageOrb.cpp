@@ -27,13 +27,13 @@ void AMageOrb::BeginPlay()
 
 void AMageOrb::OnMageOrbOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!OwningMageOrbSpellComponent) return;
+	if (!OwningMageOrbSpellComponent || OtherActor == OwningMageOrbSpellComponent->GetOwner()) return;
 
 	if (UWADHealthComponent* HealthComponent = OtherActor->FindComponentByClass<UWADHealthComponent>())
 	{		
 		UE_LOG(LogTemp, Warning, TEXT("Damage is Dealt"));
 		HealthComponent->DecreaseHealth(OwningMageOrbSpellComponent->Damage, OwningMageOrbSpellComponent->GetOwner());
-		OnMageOrbOverlapEffect();
+		OnMageOrbOverlapEffect(OtherActor);
 	}
 
 
