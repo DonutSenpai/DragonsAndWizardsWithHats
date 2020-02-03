@@ -29,9 +29,11 @@ void USpellTargetSystemComponent::StartSpellTargetSystem(USpellBase* Spell)
 	SelectedSpell = Spell;
 
 	SpellTarget = Cast<ASpellTarget>(GetWorld()->SpawnActor(SpellTargetClass));
+	if (SpellTarget)
 	SpellTarget->SetRadius(SelectedSpell->Radius);
 
 	SpellTargetRangeIndicator = Cast<ASpellTarget>(GetWorld()->SpawnActor(SpellTargetRangeIndicatorClass));
+	if (SpellTargetRangeIndicator)
 	SpellTargetRangeIndicator->SetRange(SelectedSpell->Range);
 
 	if (SpellTarget)
