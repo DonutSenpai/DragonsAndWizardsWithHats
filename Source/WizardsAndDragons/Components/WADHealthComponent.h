@@ -14,7 +14,8 @@ enum class EHealthStateEnum : uint8
 	HE_FullHealth 	UMETA(DisplayName = "FullHealth"),
 	HE_ThreeQuarterHealth	UMETA(DisplayName = "ThreeQuarterHealth"),
 	HE_HalfHealth 	UMETA(DisplayName = "HalfHealth"),
-	HE_QuarterHealth	UMETA(DisplayName = "QuarterHealth")
+	HE_QuarterHealth	UMETA(DisplayName = "QuarterHealth"),
+	HE_NoHealth	UMETA(DisplayName = "NoHealth")
 };
 
 UCLASS(Blueprintable)
@@ -64,10 +65,6 @@ public:
 	// Blueprint event to run on increased health
 	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
 		void OnIncreaseHealth(float Value, AActor* InstigatingActor);
-
-	// Blueprint event to run on increased health
-	UFUNCTION()
-		void HealthChanged();
 
 	UFUNCTION(BlueprintPure)
 		bool IsDead() const;

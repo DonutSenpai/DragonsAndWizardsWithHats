@@ -54,10 +54,14 @@ void UWADHealthComponent::DecreaseHealth(float Value, AActor* InstigatingActor)
 	if (!bInvincible && InstigatingActor != Owner)
 	{
 		bInvincible = true;
+
 		CurrentHealth -= Value;
 		CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
-		OnHealthChanged.Broadcast(Value, InstigatingActor);
+
 		OnRep_CurrentHealth();
+
+		OnHealthChanged.Broadcast(Value, InstigatingActor);
+
 		GetWorld()->GetTimerManager().SetTimer(InvincibleTimer, this, &UWADHealthComponent::ToggleInvincibilityOff, 1.0f, false);
 	}
 }
@@ -68,8 +72,10 @@ void UWADHealthComponent::IncreaseHealth(float Value, AActor* InstigatingActor)
 	{
 		CurrentHealth += Value;
 		CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
-		OnHealthChanged.Broadcast(Value, InstigatingActor);
+
 		OnRep_CurrentHealth();
+
+		OnHealthChanged.Broadcast(Value, InstigatingActor);
 	}
 }
 
@@ -80,19 +86,19 @@ void UWADHealthComponent::ToggleInvincibilityOff()
 
 void UWADHealthComponent::OnRep_CurrentHealth()
 {
-	if (FMath::IsWithin(CurrentHealth, MaxHealth * 3 / 4, MaxHealth))
+	if (FMath::IsWithinInclusive(CurrentHealth, (MaxHealth * 3 / 4) + 1, MaxHealth))
 	{
 		HealthStateEnum = EHealthStateEnum::HE_FullHealth;
 	}
-	else if (FMath::IsWithin(CurrentHealth, MaxHealth / 2, MaxHealth * 3 / 4))
+	else if (FMath::IsWithinInclusive(CurrentHealth, (MaxHealth/2) + 1, MaxHealth * 3 / 4))
 	{
 		HealthStateEnum = EHealthStateEnum::HE_ThreeQuarterHealth;
 	}
-	else if (FMath::IsWithin(CurrentHealth, MaxHealth * 1 / 4, MaxHealth / 2))
+	else if (FMath::IsWithinInclusive(CurrentHealth, (MaxHealth * 1 / 4) + 1, MaxHealth / 2))
 	{
 		HealthStateEnum = EHealthStateEnum::HE_HalfHealth;
 	}
-	else if (FMath::IsWithin(CurrentHealth, 0.0f, MaxHealth * 1 / 4))
+	else if (FMath::IsWithinInclusive(CurrentHealth, 1.0f, MaxHealth * 1 / 4))
 	{
 		HealthStateEnum = EHealthStateEnum::HE_QuarterHealth;
 	}
@@ -100,6 +106,7 @@ void UWADHealthComponent::OnRep_CurrentHealth()
 	if (IsDead())
 	{
 		OnDeath.Broadcast();
+		HealthStateEnum = EHealthStateEnum::HE_NoHealth;
 	}
 }
 
