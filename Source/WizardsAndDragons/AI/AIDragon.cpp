@@ -111,10 +111,12 @@ void AAIDragon::MeleeAttack()
 	if (bMeleeAttackReady)
 	{
 		bMeleeAttackReady = false;
+		bRangedAttackReady = false;
 
 		PlayAnimMontage(GetRandomMeleeAnimation());
 
 		GetWorld()->GetTimerManager().SetTimer(MeleeAttackCooldownTimer, this, &AAIDragon::ResetMeleeAttack, MeleeAttackCooldown, false);
+		GetWorld()->GetTimerManager().SetTimer(RangedAttackCooldownTimer, this, &AAIDragon::ResetRangedAttack, RangedAttackCooldown, false);
 	}
 }
 

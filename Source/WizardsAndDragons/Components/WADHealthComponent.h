@@ -81,7 +81,7 @@ public:
 		void OnRep_CurrentHealth();
 
 protected:
-	// The current value of heatlh
+	// The current value of health
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, VisibleAnywhere)
 		float  CurrentHealth;
 
