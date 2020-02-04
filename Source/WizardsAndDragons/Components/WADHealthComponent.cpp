@@ -86,19 +86,19 @@ void UWADHealthComponent::ToggleInvincibilityOff()
 
 void UWADHealthComponent::OnRep_CurrentHealth()
 {
-	if (FMath::IsWithinInclusive(CurrentHealth, (MaxHealth * 3 / 4) + 1, MaxHealth))
+	if (FMath::IsWithinInclusive(CurrentHealth, MaxHealth * (3/4) + 1, MaxHealth))
 	{
 		HealthStateEnum = EHealthStateEnum::HE_FullHealth;
 	}
-	else if (FMath::IsWithinInclusive(CurrentHealth, (MaxHealth/2) + 1, MaxHealth * 3 / 4))
+	else if (FMath::IsWithinInclusive(CurrentHealth, MaxHealth/2 + 1, MaxHealth * (3/4)))
 	{
 		HealthStateEnum = EHealthStateEnum::HE_ThreeQuarterHealth;
 	}
-	else if (FMath::IsWithinInclusive(CurrentHealth, (MaxHealth * 1 / 4) + 1, MaxHealth / 2))
+	else if (FMath::IsWithinInclusive(CurrentHealth, MaxHealth * (1/4) + 1, MaxHealth / 2))
 	{
 		HealthStateEnum = EHealthStateEnum::HE_HalfHealth;
 	}
-	else if (FMath::IsWithinInclusive(CurrentHealth, 1.0f, MaxHealth * 1 / 4))
+	else if (FMath::IsWithinInclusive(CurrentHealth, 1.0f, MaxHealth * (1/4)))
 	{
 		HealthStateEnum = EHealthStateEnum::HE_QuarterHealth;
 	}
