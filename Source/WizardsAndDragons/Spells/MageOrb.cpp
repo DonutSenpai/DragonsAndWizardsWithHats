@@ -9,7 +9,7 @@ AMageOrb::AMageOrb()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
 	SetRootComponent(RootComponent);
 
-	MageOrbCollision = CreateAbstractDefaultSubobject<USphereComponent>(TEXT("Mage Orb Collision"));
+	MageOrbCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Mage Orb Collision"));
 	MageOrbCollision->AttachTo(RootComponent);
 }
 
