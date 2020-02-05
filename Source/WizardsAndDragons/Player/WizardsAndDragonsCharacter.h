@@ -51,6 +51,18 @@ public:
 	void InternalOnSpellCast();
 
 protected:
+
+	//-----INPUT STUFF-------
+	UFUNCTION(BlueprintCallable, Category = "WAD Input")
+	void SetInputEnabled();
+
+	UFUNCTION(BlueprintCallable, Category = "WAD Input")
+	void SetInputDisabled();
+
+	bool InputEnabled = true;
+	//-----------------------
+
+
 	void Turn(float Rate);
 	void LookUp(float Rate);
 

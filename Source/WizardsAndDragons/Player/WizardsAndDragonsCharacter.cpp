@@ -95,6 +95,16 @@ void AWizardsAndDragonsCharacter::SetupPlayerInputComponent(class UInputComponen
 
 }
 
+void AWizardsAndDragonsCharacter::SetInputEnabled()
+{
+	InputEnabled = true;
+}
+
+void AWizardsAndDragonsCharacter::SetInputDisabled()
+{
+	InputEnabled = false;
+}
+
 void AWizardsAndDragonsCharacter::Turn(float Rate)
 {
 	if (RotateCamera)
@@ -113,6 +123,8 @@ void AWizardsAndDragonsCharacter::LookUp(float Rate)
 
 void AWizardsAndDragonsCharacter::MoveForward(float Value)
 {
+	if (!InputEnabled) return;
+
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is forward
@@ -127,6 +139,8 @@ void AWizardsAndDragonsCharacter::MoveForward(float Value)
 
 void AWizardsAndDragonsCharacter::MoveRight(float Value)
 {
+	if (!InputEnabled) return;
+
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is right
