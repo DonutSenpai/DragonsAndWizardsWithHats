@@ -5,7 +5,9 @@
 #include "WADHealthComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeathEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResurrectEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChangedEvent, float, ChangeValue, AActor*, InstigatingActor);
+
 
 
 UENUM(BlueprintType)		//"BlueprintType" is essential to include
@@ -66,12 +68,23 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
 		void OnIncreaseHealth(float Value, AActor* InstigatingActor);
 
+	//Call this to resurrect player. Will return true if successful, false otherwise.
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	bool Resurrect();
+
+	//Internal function(don't call this manually).
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Health")
+	void Internal_Resurrect();
+
 	UFUNCTION(BlueprintPure)
 		bool IsDead() const;
 
 	// Fires when health reaches zero
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 		FDeathEvent OnDeath;
+
+	UPROPERTY(BlueprintAssignable, Category = "Health")
+		FResurrectEvent OnResurrection;
 
 	// Fires when health has been changed
 	UPROPERTY(BlueprintAssignable, Category = "Health")

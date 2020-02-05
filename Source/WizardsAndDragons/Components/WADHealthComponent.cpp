@@ -79,6 +79,28 @@ void UWADHealthComponent::IncreaseHealth(float Value, AActor* InstigatingActor)
 	}
 }
 
+//Haven't tested this yet because there's no resurrection spell
+bool UWADHealthComponent::Resurrect()
+{
+	if (IsDead())
+	{
+		Internal_Resurrect();
+		return true;
+	}
+
+	return false;
+}
+
+//Haven't tested this yet because there's no resurrection spell
+void UWADHealthComponent::Internal_Resurrect_Implementation()
+{
+	if (IsDead())
+	{
+		ModifyHealth(MaxHealth);
+		OnResurrection.Broadcast();
+	}
+}
+
 void UWADHealthComponent::ToggleInvincibilityOff()
 {
 	bInvincible = false;
