@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "GenericTeamAgentInterface.h"
 #include "AIDragon.generated.h"
 
 class ADragonProjectile;
@@ -10,11 +11,13 @@ class UAnimMontage;
 class AAIController;
 
 UCLASS()
-class AAIDragon : public ACharacter
+class AAIDragon : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 public:
 	AAIDragon();
+
+	virtual FGenericTeamId GetGenericTeamId() const override { return FGenericTeamId(static_cast<uint8>(Team)); };
 
 	virtual void BeginPlay() override;
 

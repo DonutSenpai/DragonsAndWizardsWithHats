@@ -50,7 +50,6 @@ void AWADAIController::OnActorPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 {
 	if (!HasTarget(Actor))
 	{
-		//if (Actor->GetClass()->IsChildOf<AWizardsAndDragonsCharacter>())
 			AddNewTarget(Actor, Stimulus.WasSuccessfullySensed());	
 	}
 	else

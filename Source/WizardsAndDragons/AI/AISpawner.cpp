@@ -46,13 +46,18 @@ void AAISpawner::StartSpawnDragonTimer(float InDuration)
 {
 	if (InDuration > 0.0f)
 	{
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAISpawner::HandleSpawnTimerDone, InDuration, false);
+
+		GetWorld()->GetTimerManager().SetTimer(SpawnAITimerHandle, this, &AAISpawner::HandleSpawnTimerDone, InDuration, true);
 	}
 	else
 	{
 		HandleSpawnTimerDone();
 	}
+}
+
+void AAISpawner::StopSpawnDragonTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(SpawnAITimerHandle);
 }
 
 void AAISpawner::HandleSpawnTimerDone()

@@ -24,9 +24,15 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = Spawner, meta = (DisplayName = "On Spawned"))
 	void BP_OnSpawned(class AAIDragon* AIDragon);
 
+	// Spawn with default settings.
+	UFUNCTION(BlueprintCallable, Category = Spawner)
+	void StartSpawnDragonTimer(float Duration);
+
+	UFUNCTION(BlueprintCallable, Category = Spawner)
+		void StopSpawnDragonTimer();
+
 private:
 	void SpawnDragonImpl(int32 Count, float Duration, bool bRandomDuration, float RandomDurationMin, float RandomDurationMax);
-	void StartSpawnDragonTimer(float Duration);
 
 	UFUNCTION()
 	void HandleSpawnTimerDone();
@@ -51,4 +57,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Spawn)
 	bool bRandomDuration = false;
+
+	FTimerHandle SpawnAITimerHandle;
 };
