@@ -15,7 +15,7 @@ public:
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	class AWizardsAndDragonsCharacter* OwnedCharacter;
 
 	void SetRotateCameraTrue();
@@ -30,6 +30,23 @@ public:
 	void OnSpellCast();
 
 protected:
+
+	//----On Death/Resurrect------
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDeath();
+
+	UFUNCTION()
+	void Internal_OnDeath();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnResurrect();
+
+	UFUNCTION()
+	void Internal_OnResurrect();
+
+
+	//------------------
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USpellTargetSystemComponent* SpellTargetSystem = nullptr;

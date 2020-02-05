@@ -2,6 +2,7 @@
 #include "WizardsAndDragonsCharacter.h"
 #include "../SpellTargetSystem/SpellTargetSystemComponent.h"
 #include "../Spells/SpellBase.h"
+#include "../Components/WADHealthComponent.h"
 
 AWADPlayerController::AWADPlayerController()
 {
@@ -27,6 +28,14 @@ void AWADPlayerController::BeginPlay()
 
 	OwnedCharacter = Cast<AWizardsAndDragonsCharacter>(GetCharacter());
 	SpellTargetSystem->OwningController = this;
+
+	if (IsLocalController() && OwnedCharacter)
+	{	
+		UE_LOG(LogTemp, Warning, TEXT("On Death Event succesfully bound"));
+		OwnedCharacter->HealthComponent->OnDeath.AddDynamic(this, &AWADPlayerController::Internal_OnDeath);
+		OwnedCharacter->HealthComponent->OnResurrect.AddDynamic(this, &AWADPlayerController::Internal_OnResurrect);
+
+	}
 
 }
 
@@ -56,6 +65,20 @@ void AWADPlayerController::StartSpellTargetSystem(class USpellBase* Spell)
 void AWADPlayerController::OnSpellCast()
 {
 	OwnedCharacter->InternalOnSpellCast();
+}
+
+void AWADPlayerController::Internal_OnDeath()
+{
+	OnDeath();
+
+	//If wanted, possible to do other stuff here
+}
+
+void AWADPlayerController::Internal_OnResurrect()
+{
+	OnResurrect();
+
+	//If wanted, possible to do other stuff here
 }
 
 void AWADPlayerController::PrintLeftClick()

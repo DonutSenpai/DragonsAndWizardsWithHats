@@ -84,7 +84,7 @@ public:
 		FDeathEvent OnDeath;
 
 	UPROPERTY(BlueprintAssignable, Category = "Health")
-		FResurrectEvent OnResurrection;
+		FResurrectEvent OnResurrect;
 
 	// Fires when health has been changed
 	UPROPERTY(BlueprintAssignable, Category = "Health")

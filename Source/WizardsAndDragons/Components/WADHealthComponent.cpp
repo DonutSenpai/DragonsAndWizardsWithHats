@@ -97,7 +97,7 @@ void UWADHealthComponent::Internal_Resurrect_Implementation()
 	if (IsDead())
 	{
 		ModifyHealth(MaxHealth);
-		OnResurrection.Broadcast();
+		OnResurrect.Broadcast();
 	}
 }
 
