@@ -128,6 +128,18 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void FireStormAttack(FVector SpawnLocation);
 
+	UFUNCTION(NetMulticast, Reliable)
+		void Multicast_MeleeAttack();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void Multicast_BiteAttack();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void Multicast_ProjectileAttack();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void Multicast_FireStormAttack(FVector SpawnLocation);
+
 	void SpawnFireStorm(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* DamageCauser, AController* EventInstigator);
 
 	UFUNCTION(BlueprintCallable, Category = AttackBehaviour)

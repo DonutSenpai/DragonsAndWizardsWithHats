@@ -113,10 +113,13 @@ void AAIDragon::MeleeAttack()
 		bMeleeAttackReady = false;
 		bRangedAttackReady = false;
 
-		PlayAnimMontage(GetRandomMeleeAnimation());
-
 		GetWorld()->GetTimerManager().SetTimer(MeleeAttackCooldownTimer, this, &AAIDragon::ResetMeleeAttack, MeleeAttackCooldown, false);
 		GetWorld()->GetTimerManager().SetTimer(RangedAttackCooldownTimer, this, &AAIDragon::ResetRangedAttack, RangedAttackCooldown, false);
+
+		if (HasAuthority())
+		{
+			Multicast_MeleeAttack();
+		}
 	}
 }
 
@@ -126,9 +129,12 @@ void AAIDragon::BiteAttack()
 	{
 		bMeleeAttackReady = false;
 
-		PlayAnimMontage(BiteAnim);
-
 		GetWorld()->GetTimerManager().SetTimer(MeleeAttackCooldownTimer, this, &AAIDragon::ResetMeleeAttack, MeleeAttackCooldown, false);
+
+		if (HasAuthority())
+		{
+			Multicast_BiteAttack();
+		}
 	}
 }
 
@@ -161,18 +167,13 @@ void AAIDragon::ProjectileAttack()
 		bProjectileAttackReady = false;
 		bRangedAttackReady = false;
 
-		PlayAnimMontage(ProjectileAnim);
-
-		FVector StartLocation = ProjectileSpawnPoint->GetComponentLocation();
-		FRotator ForwardRotation = ProjectileSpawnPoint->GetComponentRotation();
-
-		Fire(StartLocation, ForwardRotation, this, GetController());
-
 		GetWorld()->GetTimerManager().SetTimer(ProjectileAttackCooldownTimer, this, &AAIDragon::ResetProjectileAttack, ProjectileAttackCooldown, false);
 		GetWorld()->GetTimerManager().SetTimer(RangedAttackCooldownTimer, this, &AAIDragon::ResetRangedAttack, RangedAttackCooldown, false);
+
+		if (HasAuthority())
+			Multicast_ProjectileAttack();
 	}	
 }
-
 
 void AAIDragon::FireStormAttack(FVector SpawnLocation)
 {
@@ -181,15 +182,41 @@ void AAIDragon::FireStormAttack(FVector SpawnLocation)
 		bFireStormAttackReady = false;
 		bRangedAttackReady = false;
 
-		PlayAnimMontage(ProjectileAnim);
-
-		FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
-
-		SpawnFireStorm(SpawnLocation, SpawnRotation, this, GetController());
-
 		GetWorld()->GetTimerManager().SetTimer(FireStormAttackCooldownTimer, this, &AAIDragon::ResetFireStormAttack, FireStormAttackCooldown, false);
 		GetWorld()->GetTimerManager().SetTimer(RangedAttackCooldownTimer, this, &AAIDragon::ResetRangedAttack, RangedAttackCooldown, false);
+
+		if(HasAuthority())
+		Multicast_FireStormAttack(SpawnLocation);
 	}
+}
+
+void AAIDragon::Multicast_BiteAttack_Implementation()
+{
+	PlayAnimMontage(BiteAnim);
+}
+
+void AAIDragon::Multicast_MeleeAttack_Implementation()
+{
+	PlayAnimMontage(GetRandomMeleeAnimation());
+}
+
+void AAIDragon::Multicast_ProjectileAttack_Implementation()
+{
+	PlayAnimMontage(ProjectileAnim);
+
+	FVector StartLocation = ProjectileSpawnPoint->GetComponentLocation();
+	FRotator ForwardRotation = ProjectileSpawnPoint->GetComponentRotation();
+
+	Fire(StartLocation, ForwardRotation, this, GetController());
+}
+
+void AAIDragon::Multicast_FireStormAttack_Implementation(FVector SpawnLocation)
+{
+	PlayAnimMontage(ProjectileAnim);
+
+	FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
+
+	SpawnFireStorm(SpawnLocation, SpawnRotation, this, GetController());
 }
 
 void AAIDragon::SpawnFireStorm(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* DamageCauser, AController* EventInstigator)
