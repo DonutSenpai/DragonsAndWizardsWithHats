@@ -114,6 +114,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AttackBehaviour)
 		float FireStormAttackCooldown = 5.0f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Scoring)
+		int ScoreValue = 100;
+
 	bool bDead = false;
 
 	UFUNCTION()

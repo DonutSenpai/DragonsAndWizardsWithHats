@@ -14,49 +14,58 @@ public:
 
 	// Spawn and override default settings.
 	UFUNCTION(BlueprintCallable, Category = Spawner)
-	void SpawnDragonOverride(int32 Count = 1, float Duration = 0.0f, bool bRandomDuration = false, float RandomDurationMin = 0.0f, float RandomDurationMax = 1.0f);
-	
+		void SpawnDragonOverride(int32 Count = 1, float Duration = 0.0f, bool bRandomDuration = false, float RandomDurationMin = 0.0f, float RandomDurationMax = 1.0f);
+
 	// Spawn with default settings.
 	UFUNCTION(BlueprintCallable, Category = Spawner)
-	void SpawnDragon();
+		void SpawnDragon();
 
 	// Called every time a character is spawned.
 	UFUNCTION(BlueprintImplementableEvent, Category = Spawner, meta = (DisplayName = "On Spawned"))
-	void BP_OnSpawned(class AAIDragon* AIDragon);
+		void BP_OnSpawned(class AAIDragon* AIDragon);
 
 	// Spawn with default settings.
 	UFUNCTION(BlueprintCallable, Category = Spawner)
-	void StartSpawnDragonTimer(float Duration);
+		void StartSpawnDragonTimer(float Duration);
 
 	UFUNCTION(BlueprintCallable, Category = Spawner)
 		void StopSpawnDragonTimer();
+
+	UFUNCTION()
+		void ToggleBossWave(bool bBossRound);
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+		bool bBossWave = false;
 
 private:
 	void SpawnDragonImpl(int32 Count, float Duration, bool bRandomDuration, float RandomDurationMin, float RandomDurationMax);
 
 	UFUNCTION()
-	void HandleSpawnTimerDone();
+		void HandleSpawnTimerDone();
 
 	UPROPERTY(EditAnywhere, Category = Spawn)
-	TSubclassOf<class AAIDragon> CharacterClass;
+		TSubclassOf<class AAIDragon> DragonClass;
 
 	UPROPERTY(EditAnywhere, Category = Spawn)
-	int32 Count = 1;
+		TSubclassOf<class AAIDragon> BossDragon;
 
 	UPROPERTY(EditAnywhere, Category = Spawn)
-	float Duration = 0.0f;
+		int32 Count = 1;
 
 	UPROPERTY(EditAnywhere, Category = Spawn)
-	float RandomDurationMin = 0.0f;
+		float Duration = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = Spawn)
-	float RandomDurationMax = 0.0f;
+		float RandomDurationMin = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = Spawn)
-	bool bSpawnOnBeginPlay = true;
+		float RandomDurationMax = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = Spawn)
-	bool bRandomDuration = false;
+		bool bSpawnOnBeginPlay = true;
+
+	UPROPERTY(EditAnywhere, Category = Spawn)
+		bool bRandomDuration = false;
 
 	FTimerHandle SpawnAITimerHandle;
 };
