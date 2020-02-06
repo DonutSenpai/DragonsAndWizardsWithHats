@@ -33,11 +33,6 @@ void AAIDragon::BeginPlay()
 	}
 }
 
-bool AAIDragon::ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const
-{
-	return true;
-}
-
 void AAIDragon::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
 {
 	Super::GetActorEyesViewPoint(OutLocation, OutRotation);
@@ -77,6 +72,7 @@ void AAIDragon::OnDie()
 		}
 	}
 
+	if(DeathAnim)
 	PlayAnimMontage(DeathAnim);
 
 	FTimerHandle TimerHandle;
@@ -192,6 +188,7 @@ void AAIDragon::FireStormAttack(FVector SpawnLocation)
 
 void AAIDragon::Multicast_BiteAttack_Implementation()
 {
+	if (BiteAnim)
 	PlayAnimMontage(BiteAnim);
 }
 
@@ -202,6 +199,7 @@ void AAIDragon::Multicast_MeleeAttack_Implementation()
 
 void AAIDragon::Multicast_ProjectileAttack_Implementation()
 {
+	if(ProjectileAnim)
 	PlayAnimMontage(ProjectileAnim);
 
 	FVector StartLocation = ProjectileSpawnPoint->GetComponentLocation();
@@ -212,6 +210,7 @@ void AAIDragon::Multicast_ProjectileAttack_Implementation()
 
 void AAIDragon::Multicast_FireStormAttack_Implementation(FVector SpawnLocation)
 {
+	if (ProjectileAnim)
 	PlayAnimMontage(ProjectileAnim);
 
 	FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
@@ -254,4 +253,14 @@ void AAIDragon::OnHit(float HealthChange, AActor* InstigatingActor)
 		PlayAnimMontage(GetRandomHitAnimation());
 		BP_OnDamageTaken();
 	}
+}
+
+void AAIDragon::Destroyed()
+{
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearAllTimersForObject(this);
+	}
+
+	Super::Destroyed();
 }

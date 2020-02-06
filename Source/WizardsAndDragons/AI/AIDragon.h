@@ -19,12 +19,6 @@ public:
 
 	virtual FGenericTeamId GetGenericTeamId() const override { return FGenericTeamId(static_cast<uint8>(Team)); };
 
-	virtual void BeginPlay() override;
-
-	virtual bool ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const override;
-
-	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
-
 	UFUNCTION(BlueprintPure, Category = AttackBehaviour)
 		int32 GetTeam() const { return Team; }
 
@@ -37,19 +31,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Team)
 		int32 Team = 0;
 
-	void Fire(const FVector& StartLocation, const FRotator& ForwardRotation, AActor* DamageCauser, AController* EventInstigator);
-
 	UPROPERTY(EditDefaultsOnly, Category = AttackBehaviour)
 		TSubclassOf<ADragonProjectile> ProjectileClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = AttackBehaviour)
 		TSubclassOf<AFireStorm> FireStormClass;
-
-	UFUNCTION()
-		void OnDie();
-
-	UFUNCTION()
-		void OnHit(float HealthChange, AActor* InstigatingActor);
 
 	 AAIController* GetAIController() const;
 
@@ -61,12 +47,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Reset Melee Attack"))
 		void BP_OnResetMelee();
-
-	UFUNCTION(BlueprintCallable)
-		 UAnimMontage* GetRandomHitAnimation() const;
-
-	UFUNCTION(BlueprintCallable)
-		 UAnimMontage* GetRandomMeleeAnimation() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		 UWADHealthComponent* HealthComp;
@@ -119,8 +99,28 @@ protected:
 
 	bool bDead = false;
 
+	virtual void BeginPlay() override;
+
+	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
+
+	void Fire(const FVector& StartLocation, const FRotator& ForwardRotation, AActor* DamageCauser, AController* EventInstigator);
+
 	UFUNCTION()
 		void DoRagdoll();
+
+	UFUNCTION()
+		void OnDie();
+
+	UFUNCTION()
+		void OnHit(float HealthChange, AActor* InstigatingActor);
+
+	void Destroyed();
+
+	UFUNCTION(BlueprintCallable)
+		UAnimMontage* GetRandomHitAnimation() const;
+
+	UFUNCTION(BlueprintCallable)
+		UAnimMontage* GetRandomMeleeAnimation() const;
 
 	UFUNCTION(BlueprintCallable)
 		void MeleeAttack();
@@ -145,6 +145,7 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 		void Multicast_FireStormAttack(FVector SpawnLocation);
+
 
 	void SpawnFireStorm(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* DamageCauser, AController* EventInstigator);
 

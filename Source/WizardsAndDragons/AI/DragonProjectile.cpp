@@ -13,6 +13,7 @@ ADragonProjectile::ADragonProjectile()
 	SetReplicates(true);
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	RootComponent = SphereComp;
 }
 
 // Called when the game starts or when spawned
