@@ -2,24 +2,27 @@
 #include "Player/WizardsAndDragonsCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "AI/AISpawner.h"
-#include "Components/WADHealthComponent.h"
-#include "Player/WizardsAndDragonsCharacter.h"
+#include "WADGameState.h"
 
 AWizardsAndDragonsGameMode::AWizardsAndDragonsGameMode()
 {
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/BP_WADPlayerCharacter"));
-	if (PlayerPawnBPClass.Class != NULL)
-	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
+
+}
+
+void AWizardsAndDragonsGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	CurrentWaveSpawnMultiplier = InitialWaveSpawnMultiplier;
+
+	GameStateRef->OnGameOver.AddDynamic(this, &AWizardsAndDragonsGameMode::OnRoundLost);
 }
 
 void AWizardsAndDragonsGameMode::BeginSpawnEnemies()
 {
 	for (AAISpawner* AISpawner : AISpawners)
 	{
-		AISpawner->StartSpawnDragonTimer(5.0f);
+		AISpawner->StartSpawnDragonTimer(DragonSpawnTimer);
 	}
 }
 
@@ -37,9 +40,6 @@ void AWizardsAndDragonsGameMode::OnSpawnEnemy(AAIDragon* AIDragon)
 
 	CurrentWaveNumberOfEnemiesSpawned += 1;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Number of Wave Enemies: %i"), CurrentWaveNumberOfEnemies));
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Spawned Enemies: %i"), CurrentWaveNumberOfEnemiesSpawned));
-
 	if (CurrentWaveNumberOfEnemiesSpawned == CurrentWaveNumberOfEnemies)
 	{
 		bSpawnEnemies = false;
@@ -47,13 +47,13 @@ void AWizardsAndDragonsGameMode::OnSpawnEnemy(AAIDragon* AIDragon)
 	}
 }
 
-void AWizardsAndDragonsGameMode::OnEnemyDeath(AAIDragon* AIDragon)
+void AWizardsAndDragonsGameMode::OnEnemyDeath(AAIDragon* AIDragon, int ScoreValue)
 {
 	AIDragons.Remove(AIDragon);
 
 	CurrentWaveNumberOfEnemiesKilled += 1;
 
-	Score += 100;
+	GameStateRef->AddScore(ScoreValue);
 
 	if (CurrentWaveNumberOfEnemiesKilled == CurrentWaveNumberOfEnemies)
 	{
@@ -62,34 +62,9 @@ void AWizardsAndDragonsGameMode::OnEnemyDeath(AAIDragon* AIDragon)
 	}
 }
 
-void AWizardsAndDragonsGameMode::AddPlayer(AWizardsAndDragonsCharacter* PlayerCharacter)
-{
-	PlayerCharacters.Add(PlayerCharacter);
-}
-
 void AWizardsAndDragonsGameMode::AddSpawner(AAISpawner* AISpawner)
 {
 	AISpawners.Add(AISpawner);
-}
-
-void AWizardsAndDragonsGameMode::OnPlayerDeath()
-{
-	int NumberOfDeadPlayers = 0;
-
-	for (AWizardsAndDragonsCharacter* PlayerChararcter : PlayerCharacters)
-	{
-		UWADHealthComponent* PlayerHealthComp;
-		PlayerHealthComp = PlayerChararcter->FindComponentByClass<UWADHealthComponent>();
-
-		if (PlayerHealthComp->IsDead())
-			NumberOfDeadPlayers += 1;
-
-		if (NumberOfDeadPlayers == PlayerCharacters.Num())
-		{
-			OnRoundOver();
-			OnRoundLost();
-		}
-	}
 }
 
 void AWizardsAndDragonsGameMode::OnGameOver()
@@ -103,39 +78,60 @@ void AWizardsAndDragonsGameMode::BeginNewRound()
 
 	CurrentWave += 1;
 
-	CurrentWaveSpawnMultiplier += WaveSpawnMultiplierIncrease;
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("CurrentWave: %i"), CurrentWave));
-
-	CurrentWaveNumberOfEnemies = StartingNumberOfEnemies + CurrentWave * CurrentWaveSpawnMultiplier;
-
-	NumberOfSpawnedEnemies = 0;
-
-	CurrentWaveNumberOfEnemiesKilled = 0;
-
-	CurrentWaveNumberOfEnemiesSpawned = 0;
+	GameStateRef->ChangeCurrentWave(CurrentWave);
 
 	if (CurrentWave % BossWave == 0)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Boss Round"));
+
+		for (AAISpawner* AISpawner : AISpawners)
+		{
+			AISpawner->ToggleBossWave(true);
+		}
+		CurrentWaveNumberOfEnemies = 1;
+
+		NumberOfSpawnedEnemies = 0;
+
+		CurrentWaveNumberOfEnemiesKilled = 0;
+
+		CurrentWaveNumberOfEnemiesSpawned = 0;
+
+		BeginSpawnEnemies();
 	}
 
 	else
 	{
+		for (AAISpawner* AISpawner : AISpawners)
+		{
+			AISpawner->ToggleBossWave(false);
+		}
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Regular Round"));
+
+		CurrentWaveSpawnMultiplier += WaveSpawnMultiplierIncrease;
+
+		CurrentWaveNumberOfEnemies = StartingNumberOfEnemies + CurrentWave * CurrentWaveSpawnMultiplier;
+
+		NumberOfSpawnedEnemies = 0;
+
+		CurrentWaveNumberOfEnemiesKilled = 0;
+
+		CurrentWaveNumberOfEnemiesSpawned = 0;
+
 		BeginSpawnEnemies();
 	}
-
 }
 
 void AWizardsAndDragonsGameMode::OnRoundOver()
 {
 	bSpawnEnemies = false;
+	StopSpawnEnemies();
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Round Over"));
 }
 
 void AWizardsAndDragonsGameMode::OnRoundWin()
 {
-	Score += CurrentWave * 100;
+	GameStateRef->AddScore(CurrentWave * 100);
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Round Won"));
 	GetWorld()->GetTimerManager().SetTimer(RoundIntermissionTimerHandle, this, &AWizardsAndDragonsGameMode::BeginNewRound, RoundIntermissionTime, false);
@@ -144,4 +140,23 @@ void AWizardsAndDragonsGameMode::OnRoundWin()
 void AWizardsAndDragonsGameMode::OnRoundLost()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Round Lost"));
+
+	GetWorld()->GetTimerManager().SetTimer(RoundIntermissionTimerHandle, this, &AWizardsAndDragonsGameMode::ResetToStart, RoundIntermissionTime, false);
+}
+
+
+// Reset to starting values before starting over
+void AWizardsAndDragonsGameMode::ResetToStart()
+{
+	CurrentWave = 0;
+
+	CurrentWaveSpawnMultiplier = InitialWaveSpawnMultiplier;
+
+	CurrentWaveNumberOfEnemies = StartingNumberOfEnemies + CurrentWave * CurrentWaveSpawnMultiplier;
+
+	NumberOfSpawnedEnemies = 0;
+
+	CurrentWaveNumberOfEnemiesKilled = 0;
+
+	CurrentWaveNumberOfEnemiesSpawned = 0;
 }

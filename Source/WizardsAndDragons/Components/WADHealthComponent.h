@@ -8,8 +8,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeathEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResurrectEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChangedEvent, float, ChangeValue, AActor*, InstigatingActor);
 
-
-
 UENUM(BlueprintType)		//"BlueprintType" is essential to include
 enum class EHealthStateEnum : uint8
 {

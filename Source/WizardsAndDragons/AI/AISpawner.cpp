@@ -60,14 +60,31 @@ void AAISpawner::StopSpawnDragonTimer()
 	GetWorld()->GetTimerManager().ClearTimer(SpawnAITimerHandle);
 }
 
+void AAISpawner::ToggleBossWave(bool bBossRound)
+{
+	bBossWave = bBossRound;
+}
+
 void AAISpawner::HandleSpawnTimerDone()
 {
 	FActorSpawnParameters Params;
 	Params.Owner = this;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	if (AAIDragon * SpawnedDragon = GetWorld()->SpawnActor<AAIDragon>(CharacterClass, GetActorTransform(), Params))
+	if (!bBossWave)
 	{
-		BP_OnSpawned(SpawnedDragon);
+		if (AAIDragon* SpawnedDragon = GetWorld()->SpawnActor<AAIDragon>(DragonClass, GetActorTransform(), Params))
+		{
+			BP_OnSpawned(SpawnedDragon);
+		}
 	}
+
+	else
+	{
+		if (AAIDragon* SpawnedDragon = GetWorld()->SpawnActor<AAIDragon>(BossDragon, GetActorTransform(), Params))
+		{
+			BP_OnSpawned(SpawnedDragon);
+		}
+	}
+
 }
