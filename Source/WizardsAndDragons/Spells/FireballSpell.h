@@ -24,6 +24,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnCastSpellEffect(float TimeToTravel, FVector TargetLocation = FVector::ZeroVector);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnExplodeHitTargets(const TArray<AActor*> &DamagedTargets);
+
 protected:
 
 	virtual void InternalCastSpell(FVector TargetLocation) override;

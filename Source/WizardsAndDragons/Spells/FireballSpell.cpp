@@ -16,8 +16,7 @@ void UFireballSpell::OnCastSpellEffectInternal_Implementation(float TimeToTravel
 
 void UFireballSpell::HitExplosion(FVector TargetLocation)
 {
-	TArray<AActor*> ExplosionTargets = GetSpellTargetsInRadius(TargetLocation);
-	Server_DealDamage(ExplosionTargets);
+	TArray<AActor*> ExplosionTargets = GetSpellTargetsInRadius(TargetLocation, false);
 
 	if (ExplosionTargets.Num() > 0)
 	{
@@ -44,4 +43,10 @@ void UFireballSpell::HitExplosion(FVector TargetLocation)
 
 
 	}
+
+	ExplosionTargets.Remove(GetOwner());
+	OnExplodeHitTargets(ExplosionTargets);
+
+	Server_DealDamage(ExplosionTargets);
+
 }
