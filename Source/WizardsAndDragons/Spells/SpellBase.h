@@ -58,7 +58,7 @@ protected:
 	//Gets possible spell target actors in radius. This function ASSUMES that
 	//all PAWNS are damageable(aka have a health component)
 	UFUNCTION(BlueprintCallable, Category = SpellHelperFunctions)
-	TArray<AActor*> GetSpellTargetsInRadius(FVector TargetLocation);
+	TArray<AActor*> GetSpellTargetsInRadius(FVector TargetLocation, bool bIgnoreCaster = true);
 
 	UPROPERTY(Replicated)
 	float CurrentCooldown = 0.0f;

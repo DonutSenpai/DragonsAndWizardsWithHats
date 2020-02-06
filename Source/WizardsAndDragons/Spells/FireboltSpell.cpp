@@ -6,22 +6,31 @@
 void UFireboltSpell::InternalCastSpell(FVector TargetLocation)
 {
 	TArray<AActor*> OverlappedActors = GetSpellTargetsInRadius(TargetLocation);
+	UE_LOG(LogTemp, Warning, TEXT("Spell Targets in Radius: %d"), OverlappedActors.Num());
 
 	if (OverlappedActors.Num() > 1)
 	{
-		float DistanceFromCenter = Radius;
+		float DistancesFromCenter[10] = { Radius * 2.f, Radius * 2.f, Radius * 2.f, Radius * 2.f, Radius * 2.f, Radius * 2.f, Radius * 2.f, Radius * 2.f, Radius * 2.f, Radius * 2.f };
 
-		for (AActor* OverlappedActor : OverlappedActors)
+		for (int i = 0; i < OverlappedActors.Num(); i++)
 		{
-			float ActorDistanceFromCenter = FVector::Distance(OverlappedActor->GetActorLocation(), TargetLocation);
+			if (i >= 10) break;
+			
+			DistancesFromCenter[i] = FVector::DistXY(OverlappedActors[i]->GetActorLocation(), TargetLocation);
+		}
 
-			if (ActorDistanceFromCenter < DistanceFromCenter)
+		int ClosestActorIndex = 0;
+
+		for (int i = 0; i < 10; i++)
+		{
+			if (DistancesFromCenter[i] < DistancesFromCenter[ClosestActorIndex])
 			{
-				DistanceFromCenter = ActorDistanceFromCenter;
-
-				SpellTarget = OverlappedActor;
+				ClosestActorIndex = i;
 			}
 		}
+
+		SpellTarget = OverlappedActors[FMath::Clamp(ClosestActorIndex, 0, OverlappedActors.Num())];
+		
 	}
 	else if (OverlappedActors.Num() == 1)
 	{

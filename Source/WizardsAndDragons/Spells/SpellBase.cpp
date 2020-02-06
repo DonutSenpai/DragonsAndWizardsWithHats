@@ -13,7 +13,7 @@ void USpellBase::Server_CastSpell_Implementation(FVector TargetLocation)
 
 	InternalCastSpell(TargetLocation);
 }
-void USpellBase::Server_DealDamage_Implementation(const TArray<AActor*> &SpellTargets)
+void USpellBase::Server_DealDamage_Implementation(const TArray<AActor*>& SpellTargets)
 {
 	InternalDealDamage(SpellTargets);
 }
@@ -23,7 +23,7 @@ void USpellBase::InternalCastSpell(FVector TargetLocation)
 
 }
 
-void USpellBase::InternalDealDamage(const TArray<AActor*> &SpellTargets)
+void USpellBase::InternalDealDamage(const TArray<AActor*>& SpellTargets)
 {
 	for (AActor* SpellTarget : SpellTargets)
 	{
@@ -34,18 +34,21 @@ void USpellBase::InternalDealDamage(const TArray<AActor*> &SpellTargets)
 	}
 }
 
-TArray<AActor*> USpellBase::GetSpellTargetsInRadius(FVector TargetLocation)
+TArray<AActor*> USpellBase::GetSpellTargetsInRadius(FVector TargetLocation, bool bIgnoreCaster)
 {
 	TArray<AActor*> IgnoredActors;
-	IgnoredActors.Add(GetOwner());
+
+	if (bIgnoreCaster)
+	{
+		IgnoredActors.Add(GetOwner());
+	}
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
 
 	TArray<AActor*> OverlappedActors;
-
-	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), TargetLocation, Radius, ObjectTypes, nullptr, IgnoredActors, OverlappedActors);
-
+	bool bDidOverlapAnyActors = UKismetSystemLibrary::SphereOverlapActors(GetWorld(), TargetLocation, Radius, ObjectTypes, nullptr, IgnoredActors, OverlappedActors);
+	UE_LOG(LogTemp, Warning, TEXT("Did overlap any actors: %d"), bDidOverlapAnyActors);
 	return OverlappedActors;
 }
 
