@@ -29,7 +29,8 @@ void UFireboltSpell::InternalCastSpell(FVector TargetLocation)
 			}
 		}
 
-		SpellTarget = OverlappedActors[FMath::Clamp(ClosestActorIndex, 0, OverlappedActors.Num())];
+
+		SpellTarget = OverlappedActors[FMath::Clamp(ClosestActorIndex, 0, OverlappedActors.Num() - 1)];
 		
 	}
 	else if (OverlappedActors.Num() == 1)
