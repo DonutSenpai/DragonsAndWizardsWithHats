@@ -1,6 +1,7 @@
 #include "WADGameState.h"
 #include "Player/WizardsAndDragonsCharacter.h"
 #include "Components/WADHealthComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 void AWADGameState::AddScore(int ScoreToAdd)
@@ -37,3 +38,12 @@ void AWADGameState::OnPlayerDeath()
 		}
 	}
 }
+
+void AWADGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AWADGameState, Score);
+	DOREPLIFETIME(AWADGameState, CurrentWave);
+}
+

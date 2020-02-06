@@ -19,10 +19,10 @@ public:
 
 	FGameOverEvent OnGameOver;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 		int Score = 0;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 		int CurrentWave = 0;
 
 	bool bPlayersAreDead = false;
