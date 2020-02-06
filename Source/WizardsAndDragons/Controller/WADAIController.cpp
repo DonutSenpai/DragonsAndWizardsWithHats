@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 #include "WADAIController.h"
 #include "../AI/AIDragon.h"
 #include "Components/CapsuleComponent.h"
