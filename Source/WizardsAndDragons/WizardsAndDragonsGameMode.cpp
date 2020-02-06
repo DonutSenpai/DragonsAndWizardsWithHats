@@ -106,8 +106,6 @@ void AWizardsAndDragonsGameMode::BeginNewRound()
 			AISpawner->ToggleBossWave(false);
 		}
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Regular Round"));
-
 		CurrentWaveSpawnMultiplier += WaveSpawnMultiplierIncrease;
 
 		CurrentWaveNumberOfEnemies = StartingNumberOfEnemies + CurrentWave * CurrentWaveSpawnMultiplier;
@@ -126,7 +124,6 @@ void AWizardsAndDragonsGameMode::OnRoundOver()
 {
 	bSpawnEnemies = false;
 	StopSpawnEnemies();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Round Over"));
 }
 
 void AWizardsAndDragonsGameMode::OnRoundWin()

@@ -28,6 +28,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = AttackBehaviour)
 		bool GetFireStormAttackReady() const { return bFireStormAttackReady && bRangedAttackReady; }
 
+	UFUNCTION(BlueprintPure, Category = AttackBehaviour)
+		bool GetAnyRangedAttackReady() const { return bFireStormAttackReady || bProjectileAttackReady && bRangedAttackReady; }
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Team)
 		int32 Team = 0;
 

@@ -31,10 +31,6 @@ void AWADGameState::OnPlayerDeath()
 		if (PlayerHealthComp->IsDead())
 			NumberOfDeadPlayers += 1;
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Dead Players: %i"), NumberOfDeadPlayers));
-
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Playercharacters Num: %i"), PlayerCharacters.Num()));
-
 		if (NumberOfDeadPlayers == PlayerCharacters.Num())
 		{
 			OnGameOver.Broadcast();

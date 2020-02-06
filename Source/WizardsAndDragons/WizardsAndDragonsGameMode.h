@@ -17,7 +17,6 @@ class AWizardsAndDragonsGameMode : public AGameModeBase
 		AWizardsAndDragonsGameMode();
 
 public:
-
 	// Every number of rounds the boss will show up
 	UPROPERTY(EditDefaultsOnly)
 	int BossWave = 5;
